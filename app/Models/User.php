@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+class User extends Authenticatable implements MustVerifyEmail
+{
+    use HasFactory, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
+
+    protected $fillable = [
+        'name', 'email', 'password', 'user_type', 'gender', 'blocked', 'photo_url', 'custom'
+    ];
+
+    protected $hidden = ['password', 'remember_token'];
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'blocked' => 'boolean',
+        ];
+    }
+
+    public function customer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Customer::class, 'id', 'id');
+    }
+
+    public function isAdmin(): bool { return $this->user_type === 'A'; }
+    public function isEmployee(): bool { return $this->user_type === 'F'; }
+    public function isClient(): bool { return $this->user_type === 'C'; }
+    public function isBlocked(): bool { return (bool) $this->blocked; }
+}
