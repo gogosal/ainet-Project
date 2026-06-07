@@ -24,6 +24,11 @@ use App\Livewire\VirtualTryOn\VirtualTryOnPage;
 // Home landing page
 Route::get('/', fn() => view('landing'))->name('home');
 
+// Fallback route for undefined paths
+Route::fallback(function () {
+    return redirect('/');
+});
+
 // Public routes
 Route::get('/catalog', CatalogPage::class)->name('catalog');
 Route::get('/cart', CartPage::class)->name('cart');
@@ -50,7 +55,7 @@ Route::get('/private-image/{path}', function (string $path) {
     abort(403);
 })->name('private-image')->where('path', '.*');
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
 
 // Client routes
 Route::middleware(['auth', 'verified', 'user.type:C'])->group(function () {
