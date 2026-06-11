@@ -6,7 +6,7 @@
         </div>
     @endif
 
-    <div style="max-width:640px;">
+    <div>
         <div style="background:#111120;border:1px solid #1e1e30;border-radius:12px;padding:1.75rem;">
             <h2 style="color:#e2e8f0;font-size:1rem;font-weight:700;margin:0 0 1.5rem;padding-bottom:1rem;border-bottom:1px solid #1e1e30;">
                 Configuração de preços

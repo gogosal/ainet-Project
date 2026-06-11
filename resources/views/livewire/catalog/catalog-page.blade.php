@@ -1,4 +1,4 @@
-<div>
+<div style="display:flex;flex-direction:column;height:calc(100vh - 64px - 4rem);">
     {{-- Flash success --}}
     @if (session('cart_success'))
         <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
@@ -8,18 +8,18 @@
     @endif
 
     {{-- Page header --}}
-    <div style="margin-bottom:1.5rem;">
-        <h1 style="color:#e2e8f0;font-size:1.6rem;font-weight:700;margin:0 0 0.25rem;">Catálogo</h1>
+    <div style="flex-shrink:0;margin-bottom:0.75rem;">
+        <h1 style="color:#e2e8f0;font-size:1.6rem;font-weight:700;margin:0 0 0.15rem;">Catálogo</h1>
         <p style="color:#64748b;font-size:0.9rem;margin:0;">Escolhe o teu design e personaliza a tua t-shirt</p>
     </div>
 
     {{-- Two-column layout: sidebar + content --}}
-    <div style="display:grid;grid-template-columns:240px 1fr;gap:1.5rem;align-items:start;">
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:1.5rem;flex:1;min-height:0;overflow:hidden;">
 
         {{-- ════════════════════════════ --}}
         {{-- LEFT SIDEBAR                 --}}
         {{-- ════════════════════════════ --}}
-        <aside style="position:sticky;top:80px;background:#111120;border:1px solid #1e1e30;border-radius:12px;overflow:hidden;">
+        <aside style="background:#111120;border:1px solid #1e1e30;border-radius:12px;overflow-y:auto;overflow-x:hidden;">
 
             {{-- Sidebar header --}}
             <div style="padding:1rem 1.25rem;border-bottom:1px solid #1e1e30;display:flex;align-items:center;justify-content:space-between;">
@@ -155,7 +155,7 @@
         {{-- ════════════════════════════ --}}
         {{-- RIGHT CONTENT AREA           --}}
         {{-- ════════════════════════════ --}}
-        <div>
+        <div style="overflow-y:auto;overflow-x:hidden;">
 
             {{-- Product grid --}}
             @if($images->isEmpty())
