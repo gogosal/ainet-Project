@@ -1,60 +1,50 @@
 @props([
-    'colorCode' => 'white',
+    'colorCode' => 'fafafa',
     'imageUrl' => null,
     'size' => '200px',
 ])
 
 @php
-    // Map common color names to hex if needed
-    $colorMap = [
-        'white' => '#ffffff',
-        'black' => '#111111',
-        'gray' => '#888888',
-        'grey' => '#888888',
-        'red' => '#dc2626',
-        'blue' => '#2563eb',
-        'green' => '#16a34a',
-        'yellow' => '#eab308',
-        'purple' => '#7c3aed',
-        'pink' => '#ec4899',
-        'orange' => '#ea580c',
-        'navy' => '#1e3a5f',
-        'brown' => '#78350f',
+    use Illuminate\Support\Str;
+
+    // Normalize: name → hex code
+    $code = strtolower(trim($colorCode, '#'));
+    $nameMap = [
+        'white' => 'fafafa', 'black' => '1e1e21', 'gray' => 'c7c6cf', 'grey' => 'c7c6cf',
+        'red' => 'dc192d', 'blue' => '284d9d', 'green' => '1fba8f', 'yellow' => 'ecdb2e',
+        'purple' => '73336a', 'pink' => 'fd4083', 'orange' => 'fd890f', 'navy' => '201f30',
+        'brown' => '49302c', 'cyan' => '4bd7ef',
     ];
-    $fillColor = $colorMap[strtolower($colorCode)] ?? $colorCode;
-    // Determine shadow color (darker version)
-    $shadowColor = 'rgba(0,0,0,0.12)';
+    if (isset($nameMap[$code])) $code = $nameMap[$code];
+
+    // Find best matching base shirt photo
+    $baseFile = file_exists(public_path('storage/tshirt_base/' . $code . '.jpg'))
+        ? asset('storage/tshirt_base/' . $code . '.jpg')
+        : (file_exists(public_path('storage/tshirt_base/fafafa.jpg'))
+            ? asset('storage/tshirt_base/fafafa.jpg')
+            : asset('storage/tshirt_base/plain_white.png'));
+
+    // Resolve design URL
+    $resolvedUrl = null;
+    if ($imageUrl) {
+        $bare = basename($imageUrl);
+        if (Str::startsWith($imageUrl, 'tshirt_images_private/') || Str::startsWith($imageUrl, 'tshirt_images_private')) {
+            $resolvedUrl = route('private-image', $bare);
+        } elseif (str_contains($imageUrl, '/')) {
+            $resolvedUrl = asset('storage/' . $imageUrl);
+        } elseif (file_exists(public_path('storage/tshirt_images/' . $bare))) {
+            $resolvedUrl = asset('storage/tshirt_images/' . $bare);
+        } else {
+            $resolvedUrl = route('private-image', $bare);
+        }
+    }
 @endphp
 
-<div
-    {{ $attributes->merge(['style' => "width:{$size};height:{$size};flex-shrink:0;display:flex;align-items:center;justify-content:center;"]) }}>
-    <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg"
-        style="width:100%;height:100%;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.25));">
-        <defs>
-            <clipPath id="design-clip-{{ md5($imageUrl ?? 'none') }}">
-                {{-- Clip the design to the t-shirt body area --}}
-                <rect x="55" y="65" width="90" height="115" rx="4" />
-            </clipPath>
-        </defs>
-
-        {{-- T-shirt body --}}
-        <path d="M 65,22 Q 76,42 100,42 Q 124,42 135,22 L 178,54 L 152,73 L 152,192 L 48,192 L 48,73 L 22,54 Z"
-            fill="{{ $fillColor }}" stroke="{{ $shadowColor }}" stroke-width="1.5" stroke-linejoin="round" />
-
-        {{-- Sleeve shadows for depth --}}
-        <path d="M 65,22 L 48,73 L 22,54 Z" fill="rgba(0,0,0,0.06)" />
-        <path d="M 135,22 L 152,73 L 178,54 Z" fill="rgba(0,0,0,0.06)" />
-
-        {{-- Collar detail --}}
-        <path d="M 65,22 Q 76,42 100,42 Q 124,42 135,22" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="3"
-            stroke-linecap="round" />
-
-        {{-- Design image overlay --}}
-        @if ($imageUrl)
-            <image
-                href="{{ Str::startsWith($imageUrl, 'tshirt_images_private/') ? route('private-image', $imageUrl) : asset('storage/' . $imageUrl) }}"
-                x="60" y="70" width="80" height="80" preserveAspectRatio="xMidYMid meet"
-                style="mix-blend-mode:multiply;" clip-path="url(#design-clip-{{ md5($imageUrl ?? 'none') }})" />
-        @endif
-    </svg>
+<div {{ $attributes->merge(['style' => "width:{$size};height:{$size};flex-shrink:0;position:relative;overflow:hidden;"]) }}>
+    <img src="{{ $baseFile }}" alt=""
+         style="width:100%;height:100%;object-fit:contain;display:block;">
+    @if ($resolvedUrl)
+        <img src="{{ $resolvedUrl }}" alt=""
+             style="position:absolute;top:26%;left:50%;transform:translateX(-50%);width:32%;height:32%;object-fit:contain;mix-blend-mode:multiply;pointer-events:none;">
+    @endif
 </div>

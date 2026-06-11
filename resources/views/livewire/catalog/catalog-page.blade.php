@@ -1,211 +1,180 @@
-<div style="display:flex;flex-direction:column;height:calc(100vh - 64px - 4rem);">
-    {{-- Flash success --}}
+<div>
+    {{-- Flash --}}
     @if (session('cart_success'))
         <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
-             style="position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1a2e;border:1px solid #7c3aed;border-radius:8px;padding:0.75rem 1.25rem;color:#a78bfa;font-size:0.85rem;z-index:1000;box-shadow:0 8px 24px rgba(124,58,237,.2);">
+             style="position:fixed;bottom:1.5rem;right:1.5rem;background:#f0faf5;border:1px solid #b7e1cb;color:#2d6a4f;padding:.7rem 1.1rem;font-size:.8rem;z-index:1000;border-radius:1px;">
             ✓ {{ session('cart_success') }}
         </div>
     @endif
 
-    {{-- Page header --}}
-    <div style="flex-shrink:0;margin-bottom:0.75rem;">
-        <h1 style="color:#e2e8f0;font-size:1.6rem;font-weight:700;margin:0 0 0.15rem;">Catálogo</h1>
-        <p style="color:#64748b;font-size:0.9rem;margin:0;">Escolhe o teu design e personaliza a tua t-shirt</p>
+    {{-- Header --}}
+    <div style="margin-bottom:1.75rem;">
+        <div style="font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.5rem;">Catálogo</div>
+        <h1 style="font-size:1.6rem;font-weight:300;letter-spacing:-.02em;color:#1a1a1a;margin:0;">Escolhe o teu <em style="font-style:italic;font-weight:700;">design.</em></h1>
     </div>
 
-    {{-- Two-column layout: sidebar + content --}}
-    <div style="display:grid;grid-template-columns:240px 1fr;gap:1.5rem;flex:1;min-height:0;overflow:hidden;">
+    {{-- Two-column layout --}}
+    <div style="display:grid;grid-template-columns:220px 1fr;gap:1.5rem;align-items:start;">
 
-        {{-- ════════════════════════════ --}}
-        {{-- LEFT SIDEBAR                 --}}
-        {{-- ════════════════════════════ --}}
-        <aside style="background:#111120;border:1px solid #1e1e30;border-radius:12px;overflow-y:auto;overflow-x:hidden;">
+        {{-- Sidebar --}}
+        <aside style="background:#eeecea;border:1px solid #e0ddd8;border-radius:2px;position:sticky;top:1.5rem;">
 
-            {{-- Sidebar header --}}
-            <div style="padding:1rem 1.25rem;border-bottom:1px solid #1e1e30;display:flex;align-items:center;justify-content:space-between;">
-                <span style="color:#e2e8f0;font-size:0.9rem;font-weight:600;display:flex;align-items:center;gap:0.4rem;">
-                    <svg style="width:14px;height:14px;color:#a78bfa" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
-                    </svg>
-                    Filtros
-                </span>
+            <div style="padding:.9rem 1.1rem;border-bottom:1px solid #e0ddd8;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#888;">Filtros</span>
                 @if($search || $categoryId !== null)
                     <button wire:click="$set('search', ''); $set('categoryId', null)"
-                            style="background:transparent;border:none;color:#64748b;font-size:0.75rem;cursor:pointer;padding:0;transition:color .15s;"
-                            onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#64748b'">
+                            style="background:transparent;border:none;color:#b8b4ae;font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:color .15s;"
+                            onmouseover="this.style.color='#7c6fa0'" onmouseout="this.style.color='#b8b4ae'">
                         Limpar
                     </button>
                 @endif
             </div>
 
-            <div style="padding:1.25rem;">
+            <div style="padding:1.1rem;">
 
                 {{-- Search --}}
-                <div style="margin-bottom:1.5rem;">
-                    <label style="display:block;color:#94a3b8;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.5rem;">Pesquisa</label>
-                    <div style="position:relative;">
-                        <svg style="position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);width:13px;height:13px;color:#64748b;pointer-events:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                        <input wire:model.live.debounce.300ms="search" type="text" placeholder="Pesquisar..."
-                               style="width:100%;background:#0d0d1a;border:1px solid #1e1e30;border-radius:7px;padding:0.55rem 0.6rem 0.55rem 2rem;color:#e2e8f0;font-size:0.83rem;outline:none;box-sizing:border-box;transition:border-color .2s;"
-                               onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#1e1e30'">
-                    </div>
+                <div style="margin-bottom:1.4rem;">
+                    <label style="display:block;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.55rem;">Pesquisa</label>
+                    <input wire:model.live.debounce.300ms="search" type="text" placeholder="Pesquisar..."
+                           style="width:100%;background:transparent;border:none;border-bottom:1px solid #ccc9c3;padding:.4rem 0;color:#1a1a1a;font-size:.82rem;outline:none;font-family:inherit;transition:border-color .2s;box-sizing:border-box;"
+                           onfocus="this.style.borderBottomColor='#7c6fa0'" onblur="this.style.borderBottomColor='#ccc9c3'">
                 </div>
 
-                {{-- Divider --}}
-                <div style="height:1px;background:#1e1e30;margin-bottom:1.5rem;"></div>
+                <div style="height:1px;background:#e0ddd8;margin-bottom:1.4rem;"></div>
 
-                {{-- Category --}}
-                <div style="margin-bottom:1.5rem;">
-                    <label style="display:block;color:#94a3b8;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.6rem;">Categoria</label>
-                    <div style="display:flex;flex-direction:column;gap:0.2rem;">
-                        {{-- Todos --}}
+                {{-- Categories (collapsible) --}}
+                <div x-data="{ open: false }" style="margin-bottom:1.4rem;">
+                    <button @click="open = !open"
+                            style="display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border:none;padding:0;cursor:pointer;margin-bottom:.65rem;">
+                        <label style="display:block;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;cursor:pointer;margin:0;">Categoria</label>
+                        <svg :style="open ? 'transform:rotate(180deg)' : ''" style="transition:transform .2s;flex-shrink:0;" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2 4.5L6 8.5L10 4.5" stroke="#b8b4ae" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div x-show="open" x-collapse style="display:flex;flex-direction:column;gap:.15rem;">
                         <button wire:click="$set('categoryId', null)"
-                                style="display:flex;align-items:center;gap:0.55rem;width:100%;background:{{ $categoryId === null ? 'rgba(124,58,237,.2)' : 'transparent' }};border:1px solid {{ $categoryId === null ? 'rgba(124,58,237,.4)' : 'transparent' }};border-radius:7px;padding:0.45rem 0.65rem;cursor:pointer;text-align:left;transition:all .15s;"
-                                onmouseover="if({{ $categoryId === null ? 'false' : 'true' }}) { this.style.background='rgba(255,255,255,.04)'; }"
-                                onmouseout="if({{ $categoryId === null ? 'false' : 'true' }}) { this.style.background='transparent'; }">
-                            <span style="width:14px;height:14px;border-radius:50%;border:2px solid {{ $categoryId === null ? '#a78bfa' : '#334155' }};background:{{ $categoryId === null ? '#7c3aed' : 'transparent' }};flex-shrink:0;display:flex;align-items:center;justify-content:center;">
-                                @if($categoryId === null)
-                                    <span style="width:5px;height:5px;background:white;border-radius:50%;display:block;"></span>
-                                @endif
-                            </span>
-                            <span style="color:{{ $categoryId === null ? '#a78bfa' : '#94a3b8' }};font-size:0.83rem;font-weight:{{ $categoryId === null ? '600' : '400' }};">Todos</span>
+                                style="display:flex;align-items:center;gap:.5rem;width:100%;background:transparent;border:none;padding:.4rem .5rem;cursor:pointer;text-align:left;border-radius:1px;transition:background .1s;"
+                                onmouseover="this.style.background='rgba(0,0,0,.04)'" onmouseout="this.style.background='transparent'">
+                            <span style="width:12px;height:12px;border-radius:50%;border:1.5px solid {{ $categoryId === null ? '#7c6fa0' : '#ccc9c3' }};background:{{ $categoryId === null ? '#7c6fa0' : 'transparent' }};flex-shrink:0;"></span>
+                            <span style="font-size:.8rem;color:{{ $categoryId === null ? '#7c6fa0' : '#888' }};font-weight:{{ $categoryId === null ? '600' : '400' }};">Todos</span>
                         </button>
 
                         @foreach($categories as $cat)
                             <button wire:click="$set('categoryId', {{ $cat->id }})"
-                                    style="display:flex;align-items:center;gap:0.55rem;width:100%;background:{{ $categoryId === $cat->id ? 'rgba(124,58,237,.2)' : 'transparent' }};border:1px solid {{ $categoryId === $cat->id ? 'rgba(124,58,237,.4)' : 'transparent' }};border-radius:7px;padding:0.45rem 0.65rem;cursor:pointer;text-align:left;transition:all .15s;"
-                                    onmouseover="if({{ $categoryId === $cat->id ? 'false' : 'true' }}) { this.style.background='rgba(255,255,255,.04)'; }"
-                                    onmouseout="if({{ $categoryId === $cat->id ? 'false' : 'true' }}) { this.style.background='transparent'; }">
-                                <span style="width:14px;height:14px;border-radius:50%;border:2px solid {{ $categoryId === $cat->id ? '#a78bfa' : '#334155' }};background:{{ $categoryId === $cat->id ? '#7c3aed' : 'transparent' }};flex-shrink:0;display:flex;align-items:center;justify-content:center;">
-                                    @if($categoryId === $cat->id)
-                                        <span style="width:5px;height:5px;background:white;border-radius:50%;display:block;"></span>
-                                    @endif
-                                </span>
-                                <span style="color:{{ $categoryId === $cat->id ? '#a78bfa' : '#94a3b8' }};font-size:0.83rem;font-weight:{{ $categoryId === $cat->id ? '600' : '400' }};">{{ $cat->name }}</span>
+                                    style="display:flex;align-items:center;gap:.5rem;width:100%;background:transparent;border:none;padding:.4rem .5rem;cursor:pointer;text-align:left;border-radius:1px;transition:background .1s;"
+                                    onmouseover="this.style.background='rgba(0,0,0,.04)'" onmouseout="this.style.background='transparent'">
+                                <span style="width:12px;height:12px;border-radius:50%;border:1.5px solid {{ $categoryId === $cat->id ? '#7c6fa0' : '#ccc9c3' }};background:{{ $categoryId === $cat->id ? '#7c6fa0' : 'transparent' }};flex-shrink:0;"></span>
+                                <span style="font-size:.8rem;color:{{ $categoryId === $cat->id ? '#7c6fa0' : '#888' }};font-weight:{{ $categoryId === $cat->id ? '600' : '400' }};">{{ $cat->name }}</span>
                             </button>
                         @endforeach
 
-                        {{-- Sem categoria --}}
                         <button wire:click="$set('categoryId', -1)"
-                                style="display:flex;align-items:center;gap:0.55rem;width:100%;background:{{ $categoryId === -1 ? 'rgba(124,58,237,.2)' : 'transparent' }};border:1px solid {{ $categoryId === -1 ? 'rgba(124,58,237,.4)' : 'transparent' }};border-radius:7px;padding:0.45rem 0.65rem;cursor:pointer;text-align:left;transition:all .15s;"
-                                onmouseover="if({{ $categoryId === -1 ? 'false' : 'true' }}) { this.style.background='rgba(255,255,255,.04)'; }"
-                                onmouseout="if({{ $categoryId === -1 ? 'false' : 'true' }}) { this.style.background='transparent'; }">
-                            <span style="width:14px;height:14px;border-radius:50%;border:2px solid {{ $categoryId === -1 ? '#a78bfa' : '#334155' }};background:{{ $categoryId === -1 ? '#7c3aed' : 'transparent' }};flex-shrink:0;display:flex;align-items:center;justify-content:center;">
-                                @if($categoryId === -1)
-                                    <span style="width:5px;height:5px;background:white;border-radius:50%;display:block;"></span>
-                                @endif
-                            </span>
-                            <span style="color:{{ $categoryId === -1 ? '#a78bfa' : '#94a3b8' }};font-size:0.83rem;font-weight:{{ $categoryId === -1 ? '600' : '400' }};">Sem categoria</span>
+                                style="display:flex;align-items:center;gap:.5rem;width:100%;background:transparent;border:none;padding:.4rem .5rem;cursor:pointer;text-align:left;border-radius:1px;transition:background .1s;"
+                                onmouseover="this.style.background='rgba(0,0,0,.04)'" onmouseout="this.style.background='transparent'">
+                            <span style="width:12px;height:12px;border-radius:50%;border:1.5px solid {{ $categoryId === -1 ? '#7c6fa0' : '#ccc9c3' }};background:{{ $categoryId === -1 ? '#7c6fa0' : 'transparent' }};flex-shrink:0;"></span>
+                            <span style="font-size:.8rem;color:{{ $categoryId === -1 ? '#7c6fa0' : '#888' }};font-weight:{{ $categoryId === -1 ? '600' : '400' }};">Sem categoria</span>
                         </button>
                     </div>
                 </div>
 
-                {{-- Divider --}}
-                <div style="height:1px;background:#1e1e30;margin-bottom:1.5rem;"></div>
+                <div style="height:1px;background:#e0ddd8;margin-bottom:1.4rem;"></div>
 
-                {{-- Colors (decorative) --}}
-                <div style="margin-bottom:1.5rem;">
-                    <label style="display:block;color:#94a3b8;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.6rem;">Cores disponíveis</label>
-                    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
-                        @foreach($colors as $color)
-                            <div title="{{ $color->name }}"
-                                 style="width:22px;height:22px;border-radius:50%;background:{{ $color->code }};box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);cursor:default;transition:transform .15s;"
-                                 onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
-                            </div>
-                        @endforeach
-                    </div>
-                    <p style="color:#475569;font-size:0.72rem;margin:0.5rem 0 0;">Escolhes a cor ao adicionar ao carrinho</p>
-                </div>
-
-                {{-- Divider --}}
-                <div style="height:1px;background:#1e1e30;margin-bottom:1.5rem;"></div>
-
-                {{-- Price info --}}
-                <div style="margin-bottom:1.5rem;">
-                    <label style="display:block;color:#94a3b8;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.6rem;">Preço</label>
-                    <div style="background:#0d0d1a;border-radius:8px;padding:0.75rem;">
-                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.3rem;">
-                            <span style="color:#64748b;font-size:0.78rem;">Preço unitário</span>
-                            <span style="color:#a78bfa;font-weight:700;font-size:1rem;">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
-                        </div>
-                        <div style="color:#475569;font-size:0.72rem;line-height:1.4;">
-                            Desconto a partir de {{ $prices->qty_discount }} unidades
-                            <span style="color:#4ade80;display:block;margin-top:2px;">→ €{{ number_format($prices->unit_price_catalog_discount, 2) }}/un</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Clear filters button --}}
-                @if($search || $categoryId !== null)
-                    <button wire:click="$set('search', ''); $set('categoryId', null)"
-                            style="display:flex;align-items:center;justify-content:center;gap:0.4rem;width:100%;background:transparent;border:1px solid #1e1e30;border-radius:7px;padding:0.5rem;color:#64748b;font-size:0.82rem;cursor:pointer;transition:all .2s;"
-                            onmouseover="this.style.borderColor='#7c3aed';this.style.color='#a78bfa'" onmouseout="this.style.borderColor='#1e1e30';this.style.color='#64748b'">
-                        <svg style="width:12px;height:12px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                {{-- Colors (collapsible) --}}
+                <div x-data="{ open: false }" style="margin-bottom:1.4rem;">
+                    <button @click="open = !open"
+                            style="display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border:none;padding:0;cursor:pointer;margin-bottom:.65rem;">
+                        <label style="display:block;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;cursor:pointer;margin:0;">Cores</label>
+                        <svg :style="open ? 'transform:rotate(180deg)' : ''" style="transition:transform .2s;flex-shrink:0;" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2 4.5L6 8.5L10 4.5" stroke="#b8b4ae" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        Limpar filtros
                     </button>
-                @endif
+                    <div x-show="open" x-collapse>
+                        <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.5rem;">
+                            @foreach($colors as $color)
+                                <div title="{{ $color->name }}"
+                                     style="width:20px;height:20px;border-radius:50%;background:#{{ $color->code }};border:1px solid rgba(0,0,0,.1);cursor:default;transition:transform .15s;"
+                                     onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                                </div>
+                            @endforeach
+                        </div>
+                        <p style="color:#c8c4be;font-size:.68rem;margin:0;">Escolhes ao adicionar ao carrinho</p>
+                    </div>
+                </div>
+
+                <div style="height:1px;background:#e0ddd8;margin-bottom:1.4rem;"></div>
+
+                {{-- Price --}}
+                <div>
+                    <label style="display:block;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.55rem;">Preço</label>
+                    <div style="padding:.7rem .9rem;background:#f5f4f1;border:1px solid #e0ddd8;border-radius:1px;">
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.3rem;">
+                            <span style="color:#aaa;font-size:.75rem;">Por unidade</span>
+                            <span style="color:#1a1a1a;font-weight:700;font-size:.95rem;">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
+                        </div>
+                        <div style="color:#b8b4ae;font-size:.68rem;line-height:1.4;">
+                            Desc. a partir de {{ $prices->qty_discount }} un.
+                            <span style="color:#2d6a4f;display:block;margin-top:2px;">→ €{{ number_format($prices->unit_price_catalog_discount, 2) }}/un</span>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </aside>
 
-        {{-- ════════════════════════════ --}}
-        {{-- RIGHT CONTENT AREA           --}}
-        {{-- ════════════════════════════ --}}
-        <div style="overflow-y:auto;overflow-x:hidden;">
+        {{-- Content --}}
+        <div>
 
-            {{-- Product grid --}}
             @if($images->isEmpty())
-                <div style="text-align:center;padding:5rem 2rem;color:#64748b;background:#111120;border:1px solid #1e1e30;border-radius:12px;">
-                    <div style="font-size:3rem;margin-bottom:1rem;">👕</div>
-                    <p style="font-size:1rem;margin:0 0 0.25rem;">Nenhum design encontrado</p>
-                    <p style="font-size:0.85rem;margin:0;">Tenta uma pesquisa diferente ou limpa os filtros.</p>
+                <div style="text-align:center;padding:5rem 2rem;border:1px solid #e0ddd8;border-radius:2px;">
+                    <p style="font-size:.9rem;color:#888;margin:0 0 .25rem;">Nenhum design encontrado</p>
+                    <p style="font-size:.8rem;color:#c8c4be;margin:0;">Tenta uma pesquisa diferente.</p>
                 </div>
             @else
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-bottom:2rem;">
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;">
                     @foreach($images as $image)
-                        <div style="background:#111120;border:1px solid #1e1e30;border-radius:12px;overflow:hidden;transition:all .2s;cursor:pointer;"
-                             onmouseover="this.style.borderColor='#7c3aed';this.style.transform='translateY(-2px)'"
-                             onmouseout="this.style.borderColor='#1e1e30';this.style.transform='translateY(0)'">
+                        <div style="background:#fff;border:1px solid #e0ddd8;border-radius:2px;overflow:hidden;transition:border-color .15s;"
+                             onmouseover="this.style.borderColor='#7c6fa0'" onmouseout="this.style.borderColor='#e0ddd8'">
 
-                            {{-- Image area --}}
-                            <div style="background:#0d0d1a;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:170px;">
-                                <x-tshirt-preview
-                                    :colorCode="'white'"
-                                    :imageUrl="$image->image_url"
-                                    size="140px" />
+                            @php
+                                $bare = basename($image->image_url);
+                                if (\Illuminate\Support\Str::startsWith($image->image_url, 'tshirt_images_private/')) {
+                                    $thumbDesignUrl = route('private-image', $bare);
+                                } elseif (str_contains($image->image_url, '/')) {
+                                    $thumbDesignUrl = asset('storage/' . $image->image_url);
+                                } else {
+                                    $thumbDesignUrl = asset('storage/tshirt_images/' . $bare);
+                                }
+                            @endphp
+                            <div style="background:#eeecea;height:180px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e0ddd8;overflow:hidden;padding:1rem;">
+                                <img src="{{ $thumbDesignUrl }}" alt="{{ $image->name }}"
+                                     style="max-width:100%;max-height:100%;object-fit:contain;display:block;"
+                                     onerror="this.style.opacity='.15'">
                             </div>
 
-                            {{-- Info --}}
-                            <div style="padding:0.9rem;">
+                            <div style="padding:.85rem;">
                                 @if($image->category)
-                                    <span style="display:inline-block;background:rgba(124,58,237,.15);color:#a78bfa;border-radius:20px;padding:1px 8px;font-size:0.68rem;font-weight:500;margin-bottom:0.35rem;">
-                                        {{ $image->category->name }}
-                                    </span>
+                                    <span style="display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7c6fa0;margin-bottom:.35rem;">{{ $image->category->name }}</span>
                                 @endif
-                                <h3 style="color:#e2e8f0;font-size:0.88rem;font-weight:600;margin:0 0 0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                <h3 style="color:#1a1a1a;font-size:.85rem;font-weight:600;margin:0 0 .2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                                     {{ $image->name }}
                                 </h3>
                                 @if($image->description)
-                                    <p style="color:#64748b;font-size:0.75rem;margin:0 0 0.65rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45;">
+                                    <p style="color:#aaa;font-size:.72rem;margin:0 0 .65rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45;">
                                         {{ $image->description }}
                                     </p>
                                 @endif
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.4rem;">
-                                    <span style="color:#a78bfa;font-weight:700;font-size:0.95rem;">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
-                                    <div style="display:flex;gap:0.35rem;">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;">
+                                    <span style="color:#1a1a1a;font-weight:700;font-size:.9rem;">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
+                                    <div style="display:flex;gap:.35rem;">
                                         <a href="{{ route('try-on', ['design' => $image->id]) }}"
                                            title="Provador 3D"
-                                           style="background:#1a1a2e;color:#64748b;border:1px solid #1e1e30;border-radius:6px;padding:0.35rem 0.55rem;font-size:0.78rem;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;"
-                                           onmouseover="this.style.borderColor='#7c3aed';this.style.color='#a78bfa'" onmouseout="this.style.borderColor='#1e1e30';this.style.color='#64748b'">
-                                            ◈
+                                           style="background:#f5f4f1;color:#888;border:1px solid #e0ddd8;padding:.3rem .55rem;font-size:.72rem;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;border-radius:1px;"
+                                           onmouseover="this.style.borderColor='#7c6fa0';this.style.color='#7c6fa0'" onmouseout="this.style.borderColor='#e0ddd8';this.style.color='#888'">
+                                            3D
                                         </a>
                                         <button wire:click="openModal({{ $image->id }})"
-                                                style="background:#7c3aed;color:white;border:none;border-radius:6px;padding:0.35rem 0.75rem;font-size:0.78rem;font-weight:600;cursor:pointer;transition:background .2s;"
-                                                onmouseover="this.style.background='#6d28d9'" onmouseout="this.style.background='#7c3aed'">
+                                                style="background:#1a1a1a;color:#f5f4f1;border:none;padding:.3rem .75rem;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .15s;border-radius:1px;"
+                                                onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1a1a1a'">
                                             + Adicionar
                                         </button>
                                     </div>
@@ -217,81 +186,78 @@
 
                 {{-- Pagination --}}
                 @if($images->hasPages())
-                    <div style="display:flex;justify-content:center;gap:0.5rem;padding:1rem 0;">
+                    <div style="display:flex;justify-content:center;gap:.4rem;padding:1rem 0;">
                         @if($images->onFirstPage())
-                            <span style="background:#1a1a2e;color:#64748b;border:1px solid #1e1e30;border-radius:6px;padding:0.4rem 0.9rem;font-size:0.85rem;">←</span>
+                            <span style="background:#eeecea;color:#c8c4be;border:1px solid #e0ddd8;padding:.4rem .9rem;font-size:.8rem;border-radius:1px;">←</span>
                         @else
-                            <button wire:click="previousPage" style="background:#1a1a2e;color:#94a3b8;border:1px solid #1e1e30;border-radius:6px;padding:0.4rem 0.9rem;font-size:0.85rem;cursor:pointer;">←</button>
+                            <button wire:click="previousPage" style="background:#fff;color:#888;border:1px solid #e0ddd8;padding:.4rem .9rem;font-size:.8rem;cursor:pointer;border-radius:1px;transition:all .15s;" onmouseover="this.style.borderColor='#1a1a1a'" onmouseout="this.style.borderColor='#e0ddd8'">←</button>
                         @endif
 
                         @foreach($images->getUrlRange(max(1, $images->currentPage()-2), min($images->lastPage(), $images->currentPage()+2)) as $page => $url)
                             <button wire:click="gotoPage({{ $page }})"
-                                    style="background:{{ $images->currentPage() === $page ? '#7c3aed' : '#1a1a2e' }};color:{{ $images->currentPage() === $page ? 'white' : '#94a3b8' }};border:1px solid {{ $images->currentPage() === $page ? '#7c3aed' : '#1e1e30' }};border-radius:6px;padding:0.4rem 0.75rem;font-size:0.85rem;cursor:pointer;">
+                                    style="background:{{ $images->currentPage() === $page ? '#1a1a1a' : '#fff' }};color:{{ $images->currentPage() === $page ? '#f5f4f1' : '#888' }};border:1px solid {{ $images->currentPage() === $page ? '#1a1a1a' : '#e0ddd8' }};padding:.4rem .75rem;font-size:.8rem;cursor:pointer;border-radius:1px;transition:all .15s;">
                                 {{ $page }}
                             </button>
                         @endforeach
 
                         @if($images->hasMorePages())
-                            <button wire:click="nextPage" style="background:#1a1a2e;color:#94a3b8;border:1px solid #1e1e30;border-radius:6px;padding:0.4rem 0.9rem;font-size:0.85rem;cursor:pointer;">→</button>
+                            <button wire:click="nextPage" style="background:#fff;color:#888;border:1px solid #e0ddd8;padding:.4rem .9rem;font-size:.8rem;cursor:pointer;border-radius:1px;transition:all .15s;" onmouseover="this.style.borderColor='#1a1a1a'" onmouseout="this.style.borderColor='#e0ddd8'">→</button>
                         @else
-                            <span style="background:#1a1a2e;color:#64748b;border:1px solid #1e1e30;border-radius:6px;padding:0.4rem 0.9rem;font-size:0.85rem;">→</span>
+                            <span style="background:#eeecea;color:#c8c4be;border:1px solid #e0ddd8;padding:.4rem .9rem;font-size:.8rem;border-radius:1px;">→</span>
                         @endif
                     </div>
                 @endif
             @endif
-        </div>{{-- end right col --}}
+        </div>
 
-    </div>{{-- end grid --}}
+    </div>
 
-    {{-- Add to cart modal --}}
+    {{-- Modal --}}
     @if($showModal && $selectedImage)
-        <div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;"
+        <div style="position:fixed;inset:0;background:rgba(26,26,26,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;"
              wire:click.self="closeModal">
-            <div style="background:#111120;border:1px solid #1e1e30;border-radius:16px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.6);">
+            <div style="background:#f5f4f1;border:1px solid #e0ddd8;border-radius:2px;width:100%;max-width:460px;overflow:hidden;">
 
-                {{-- Modal header --}}
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid #1e1e30;">
-                    <h3 style="color:#e2e8f0;font-size:1rem;font-weight:600;margin:0;">{{ $selectedImage->name }}</h3>
-                    <button wire:click="closeModal" style="background:transparent;border:none;color:#64748b;cursor:pointer;font-size:1.2rem;line-height:1;">×</button>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.35rem;border-bottom:1px solid #e0ddd8;">
+                    <div>
+                        <div style="font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.2rem;">Adicionar ao carrinho</div>
+                        <h3 style="color:#1a1a1a;font-size:.9rem;font-weight:600;margin:0;">{{ $selectedImage->name }}</h3>
+                    </div>
+                    <button wire:click="closeModal" style="background:transparent;border:none;color:#aaa;cursor:pointer;font-size:1.2rem;line-height:1;transition:color .15s;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#aaa'">×</button>
                 </div>
 
-                {{-- Preview + form --}}
-                <div style="padding:1.5rem;display:flex;gap:1.5rem;">
-                    {{-- Preview --}}
+                <div style="padding:1.35rem;display:flex;gap:1.35rem;">
                     <div style="flex-shrink:0;">
                         <x-tshirt-preview
                             :colorCode="$selectedColor ?: 'white'"
                             :imageUrl="$selectedImage->image_url"
-                            size="120px" />
+                            size="110px" />
                     </div>
 
-                    {{-- Form --}}
                     <div style="flex:1;display:flex;flex-direction:column;gap:1rem;">
-                        {{-- Color selection --}}
+                        {{-- Color --}}
                         <div>
-                            <label style="display:block;color:#94a3b8;font-size:0.78rem;font-weight:500;margin-bottom:0.5rem;">Cor</label>
-                            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+                            <label style="display:block;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.5rem;">Cor</label>
+                            <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
                                 @foreach($colors as $color)
                                     <button wire:click="$set('selectedColor', '{{ $color->code }}')"
                                             title="{{ $color->name }}"
-                                            style="width:28px;height:28px;border-radius:50%;background:{{ $color->code }};border:2px solid {{ $selectedColor === $color->code ? '#a78bfa' : 'transparent' }};cursor:pointer;box-shadow:{{ $selectedColor === $color->code ? '0 0 0 2px #7c3aed' : 'inset 0 0 0 1px rgba(255,255,255,.15)' }};transition:all .15s;">
+                                            style="width:26px;height:26px;border-radius:50%;background:#{{ $color->code }};border:2px solid {{ $selectedColor === $color->code ? '#7c6fa0' : 'transparent' }};cursor:pointer;box-shadow:{{ $selectedColor === $color->code ? '0 0 0 2px #7c6fa0' : 'inset 0 0 0 1px rgba(0,0,0,.12)' }};transition:all .15s;">
                                     </button>
                                 @endforeach
                             </div>
                             @if($selectedColor)
-                                <p style="color:#64748b;font-size:0.75rem;margin-top:0.3rem;">
-                                    {{ $colors->firstWhere('code', $selectedColor)?->name }}
-                                </p>
+                                <p style="color:#aaa;font-size:.7rem;margin-top:.3rem;">{{ $colors->firstWhere('code', $selectedColor)?->name }}</p>
                             @endif
                         </div>
 
                         {{-- Size --}}
                         <div>
-                            <label style="display:block;color:#94a3b8;font-size:0.78rem;font-weight:500;margin-bottom:0.5rem;">Tamanho</label>
-                            <div style="display:flex;gap:0.4rem;">
+                            <label style="display:block;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.5rem;">Tamanho</label>
+                            <div style="display:flex;gap:.35rem;">
                                 @foreach(['XS','S','M','L','XL'] as $size)
                                     <button wire:click="$set('selectedSize', '{{ $size }}')"
-                                            style="background:{{ $selectedSize === $size ? '#7c3aed' : '#1a1a2e' }};color:{{ $selectedSize === $size ? 'white' : '#94a3b8' }};border:1px solid {{ $selectedSize === $size ? '#7c3aed' : '#1e1e30' }};border-radius:6px;padding:0.3rem 0.6rem;font-size:0.8rem;cursor:pointer;font-weight:500;transition:all .15s;min-width:36px;">
+                                            style="background:{{ $selectedSize === $size ? '#1a1a1a' : 'transparent' }};color:{{ $selectedSize === $size ? '#f5f4f1' : '#888' }};border:1px solid {{ $selectedSize === $size ? '#1a1a1a' : '#d8d5d0' }};padding:.28rem .55rem;font-size:.75rem;font-weight:600;cursor:pointer;border-radius:1px;transition:all .15s;min-width:34px;font-family:inherit;">
                                         {{ $size }}
                                     </button>
                                 @endforeach
@@ -300,49 +266,52 @@
 
                         {{-- Qty --}}
                         <div>
-                            <label style="display:block;color:#94a3b8;font-size:0.78rem;font-weight:500;margin-bottom:0.5rem;">Quantidade</label>
-                            <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <label style="display:block;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.5rem;">Quantidade</label>
+                            <div style="display:flex;align-items:center;gap:.5rem;">
                                 <button wire:click="$set('qty', max(1, $qty - 1))"
-                                        style="background:#1a1a2e;border:1px solid #1e1e30;border-radius:6px;width:32px;height:32px;color:#94a3b8;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">−</button>
-                                <span style="color:#e2e8f0;font-weight:600;min-width:2rem;text-align:center;">{{ $qty }}</span>
+                                        style="background:transparent;border:1px solid #d8d5d0;width:30px;height:30px;color:#888;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;border-radius:1px;transition:all .15s;font-family:inherit;"
+                                        onmouseover="this.style.borderColor='#1a1a1a'" onmouseout="this.style.borderColor='#d8d5d0'">−</button>
+                                <span style="color:#1a1a1a;font-weight:600;min-width:2rem;text-align:center;font-size:.9rem;">{{ $qty }}</span>
                                 <button wire:click="$set('qty', min(99, $qty + 1))"
-                                        style="background:#1a1a2e;border:1px solid #1e1e30;border-radius:6px;width:32px;height:32px;color:#94a3b8;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">+</button>
+                                        style="background:transparent;border:1px solid #d8d5d0;width:30px;height:30px;color:#888;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;border-radius:1px;transition:all .15s;font-family:inherit;"
+                                        onmouseover="this.style.borderColor='#1a1a1a'" onmouseout="this.style.borderColor='#d8d5d0'">+</button>
                             </div>
                         </div>
 
-                        {{-- Price info --}}
-                        <div style="background:#1a1a2e;border-radius:6px;padding:0.6rem 0.75rem;font-size:0.8rem;">
-                            <div style="display:flex;justify-content:space-between;color:#64748b;">
-                                <span>Preço unitário</span>
-                                <span style="color:#a78bfa;font-weight:600;">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
+                        {{-- Price --}}
+                        <div style="background:#eeecea;border:1px solid #e0ddd8;padding:.6rem .75rem;font-size:.75rem;border-radius:1px;">
+                            <div style="display:flex;justify-content:space-between;color:#888;">
+                                <span>Por unidade</span>
+                                <span style="color:#1a1a1a;font-weight:700;">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
                             </div>
                             @if($qty >= $prices->qty_discount)
-                                <div style="display:flex;justify-content:space-between;color:#4ade80;margin-top:0.25rem;font-size:0.75rem;">
-                                    <span>✓ Desconto de quantidade aplicado</span>
+                                <div style="display:flex;justify-content:space-between;color:#2d6a4f;margin-top:.25rem;font-size:.7rem;">
+                                    <span>✓ Desconto de quantidade</span>
                                     <span>€{{ number_format($prices->unit_price_catalog_discount, 2) }}/un</span>
                                 </div>
                             @else
-                                <div style="color:#64748b;margin-top:0.25rem;font-size:0.72rem;">
-                                    Desconto a partir de {{ $prices->qty_discount }} unidades
+                                <div style="color:#c8c4be;margin-top:.25rem;font-size:.68rem;">
+                                    Desc. a partir de {{ $prices->qty_discount }} unidades
                                 </div>
                             @endif
                         </div>
                     </div>
                 </div>
 
-                {{-- Modal footer --}}
-                <div style="padding:1rem 1.5rem;border-top:1px solid #1e1e30;display:flex;gap:0.75rem;justify-content:flex-end;">
+                <div style="padding:.9rem 1.35rem;border-top:1px solid #e0ddd8;display:flex;gap:.6rem;justify-content:flex-end;background:#eeecea;">
                     <button wire:click="closeModal"
-                            style="background:transparent;color:#94a3b8;border:1px solid #1e1e30;border-radius:6px;padding:0.55rem 1.25rem;font-size:0.875rem;cursor:pointer;">
+                            style="background:transparent;color:#888;border:1px solid #d8d5d0;padding:.5rem 1.1rem;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:1px;font-family:inherit;transition:all .15s;"
+                            onmouseover="this.style.borderColor='#1a1a1a';this.style.color='#1a1a1a'" onmouseout="this.style.borderColor='#d8d5d0';this.style.color='#888'">
                         Cancelar
                     </button>
                     <button wire:click="addToCart"
-                            style="background:#7c3aed;color:white;border:none;border-radius:6px;padding:0.55rem 1.25rem;font-size:0.875rem;font-weight:600;cursor:pointer;transition:background .2s;"
-                            onmouseover="this.style.background='#6d28d9'" onmouseout="this.style.background='#7c3aed'">
-                        Adicionar ao carrinho
+                            style="background:#1a1a1a;color:#f5f4f1;border:none;padding:.5rem 1.1rem;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:1px;font-family:inherit;transition:background .15s;"
+                            onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1a1a1a'">
+                        Adicionar
                     </button>
                 </div>
             </div>
         </div>
     @endif
 </div>
+

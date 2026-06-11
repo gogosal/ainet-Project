@@ -18,21 +18,22 @@ class CartService
         return array_sum(array_column($this->items(), 'qty'));
     }
 
-    public function add(int $imageId, string $colorCode, string $size, int $qty): void
+    public function add(int $imageId, string $colorCode, string $size, int $qty, string $side = 'front'): void
     {
         $cart = $this->items();
         foreach ($cart as &$item) {
-            if ($item['tshirt_image_id'] === $imageId && $item['color_code'] === $colorCode && $item['size'] === $size) {
+            if ($item['tshirt_image_id'] === $imageId && $item['color_code'] === $colorCode && $item['size'] === $size && ($item['side'] ?? 'front') === $side) {
                 $item['qty'] += $qty;
                 session(['cart' => $cart]);
                 return;
             }
         }
-        $cart[] = compact('imageId', 'colorCode', 'size', 'qty') + [
+        $cart[] = [
             'tshirt_image_id' => $imageId,
-            'color_code' => $colorCode,
-            'size' => $size,
-            'qty' => $qty,
+            'color_code'      => $colorCode,
+            'size'            => $size,
+            'qty'             => $qty,
+            'side'            => $side,
         ];
         session(['cart' => $cart]);
     }

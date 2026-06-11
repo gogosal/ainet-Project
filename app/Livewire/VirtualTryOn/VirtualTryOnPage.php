@@ -7,20 +7,46 @@ use App\Models\Price;
 use App\Models\TshirtImage;
 use App\Services\CartService;
 use Livewire\Component;
+use Livewire\Attributes\Url;
 
 class VirtualTryOnPage extends Component
 {
     public ?int $selectedImageId = null;
+
+    #[Url(as: 'color')]
     public string $selectedColor = '';
+
+    #[Url(as: 'size')]
     public string $selectedSize = 'M';
+
+    #[Url(as: 'side')]
+    public string $selectedSide = 'front';
+
     public int $qty = 1;
     public string $cartMessage = '';
 
-    public function mount(?int $design = null): void
+    public function mount(): void
     {
-        $first = TshirtImage::whereNull('customer_id')->first();
-        $this->selectedImageId = $design ?? $first?->id;
-        $this->selectedColor = Color::first()?->code ?? 'white';
+        // Read design from URL once on arrival (e.g. clicking "3D" in catalog).
+        // Not persisted via #[Url] so refreshing always starts with no design.
+        if ($this->selectedImageId === null) {
+            $d = request()->query('design');
+            if ($d && ctype_digit((string)$d)) {
+                $this->selectedImageId = (int)$d;
+            }
+        }
+
+        if (empty($this->selectedColor)) {
+            $this->selectedColor = Color::where('code', 'fafafa')->first()?->code
+                ?? Color::where('name', 'Branco')->first()?->code
+                ?? 'fafafa';
+        }
+        if (!in_array($this->selectedSize, ['XS','S','M','L','XL'])) {
+            $this->selectedSize = 'M';
+        }
+        if (!in_array($this->selectedSide, ['front','back'])) {
+            $this->selectedSide = 'front';
+        }
     }
 
     public function selectDesign(int $id): void
@@ -32,6 +58,11 @@ class VirtualTryOnPage extends Component
     public function selectColor(string $code): void
     {
         $this->selectedColor = $code;
+    }
+
+    public function selectSide(string $side): void
+    {
+        $this->selectedSide = in_array($side, ['front', 'back']) ? $side : 'front';
     }
 
     public function addToCart(): void
@@ -50,7 +81,8 @@ class VirtualTryOnPage extends Component
             $this->selectedImageId,
             $this->selectedColor,
             $this->selectedSize,
-            $this->qty
+            $this->qty,
+            $this->selectedSide
         );
 
         $this->dispatch('cart-updated');

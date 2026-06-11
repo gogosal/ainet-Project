@@ -24,6 +24,19 @@ use App\Livewire\VirtualTryOn\VirtualTryOnPage;
 // Home landing page
 Route::get('/', fn() => view('landing'))->name('home');
 
+// Serve private tshirt images (custom uploads)
+Route::get('/private-image/{filename}', function (string $filename) {
+    $filename = basename($filename); // prevent path traversal
+    foreach (['tshirt_images_private', 'tshirt_images'] as $dir) {
+        $path = storage_path('app/private/' . $dir . '/' . $filename);
+        if (file_exists($path)) {
+            $mime = str_ends_with($filename, '.jpg') || str_ends_with($filename, '.jpeg') ? 'image/jpeg' : 'image/png';
+            return response()->file($path, ['Content-Type' => $mime]);
+        }
+    }
+    abort(404);
+})->name('private-image');
+
 // Fallback route for undefined paths
 Route::fallback(function () {
     return redirect('/');

@@ -1,29 +1,30 @@
 <x-layouts.auth :title="__('Recuperar password')">
-    <h2 style="color:#e2e8f0;font-size:1.3rem;font-weight:600;margin:0 0 0.5rem;">Recuperar password</h2>
-    <p style="color:#64748b;font-size:0.85rem;margin:0 0 1.5rem;">Insere o teu email e enviamos um link de recuperação.</p>
+    <div style="margin-bottom:2rem;">
+        <div style="font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.9rem;">Recuperação</div>
+        <h1 style="font-size:1.9rem;font-weight:300;letter-spacing:-.03em;line-height:1.1;color:#1a1a1a;">Esqueceste a<br><em style="font-style:italic;font-weight:700;">password?</em></h1>
+    </div>
+
+    <div style="height:1px;background:#e0ddd8;margin-bottom:1.75rem;"></div>
+
+    <p style="color:#888;font-size:.84rem;line-height:1.55;margin-bottom:1.5rem;">Insere o teu e-mail e enviamos um link para definires uma nova password.</p>
 
     @if (session('status'))
-        <div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80;padding:0.75rem;border-radius:6px;margin-bottom:1rem;font-size:0.85rem;">
-            {{ session('status') }}
-        </div>
+        <div class="auth-status-ok">{{ session('status') }}</div>
     @endif
 
-    <form method="POST" action="{{ route('password.email') }}" style="display:flex;flex-direction:column;gap:1rem;">
+    <form method="POST" action="{{ route('password.email') }}" style="display:flex;flex-direction:column;gap:1.25rem;">
         @csrf
         <div>
-            <label style="display:block;color:#94a3b8;font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Email</label>
+            <label class="auth-label">E-mail</label>
             <input name="email" type="email" value="{{ old('email') }}" required autofocus
-                   style="width:100%;background:#1a1a2e;border:1px solid {{ $errors->has('email') ? '#ef4444' : '#1e1e30' }};border-radius:6px;padding:0.6rem 0.75rem;color:#e2e8f0;font-size:0.9rem;outline:none;box-sizing:border-box;"
-                   placeholder="email@exemplo.pt"
-                   onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#1e1e30'">
-            @error('email') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.3rem;">{{ $message }}</p> @enderror
+                   class="auth-input {{ $errors->has('email') ? 'is-error' : '' }}"
+                   placeholder="email@exemplo.pt">
+            @error('email') <p class="auth-error">{{ $message }}</p> @enderror
         </div>
-        <button type="submit"
-                style="width:100%;background:#7c3aed;color:white;border:none;border-radius:6px;padding:0.7rem;font-size:0.9rem;font-weight:600;cursor:pointer;">
-            Enviar link
-        </button>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;">
+            <button type="submit" class="auth-btn">Enviar link</button>
+            <a href="{{ route('login') }}" class="auth-link">← Voltar</a>
+        </div>
     </form>
-    <p style="color:#64748b;font-size:0.85rem;text-align:center;margin-top:1.5rem;">
-        <a href="{{ route('login') }}" style="color:#a78bfa;text-decoration:none;">← Voltar ao login</a>
-    </p>
 </x-layouts.auth>

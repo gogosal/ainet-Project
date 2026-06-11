@@ -108,6 +108,7 @@ class CheckoutPage extends Component
                     'qty'             => $item['qty'],
                     'unit_price'      => $item['unit_price'],
                     'sub_total'       => $item['sub_total'],
+                    'custom'          => ['side' => $item['side'] ?? 'front'],
                 ]);
             }
 

@@ -1,62 +1,60 @@
-<div style="display:flex;flex-direction:column;height:calc(100vh - 64px - 4rem);">
+<div style="display:flex;flex-direction:column;height:calc(100vh - 56px - 5rem);">
     {{-- Cart flash --}}
     @if ($cartMessage)
         <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
-            style="position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1a2e;border:1px solid #7c3aed;border-radius:8px;padding:0.75rem 1.25rem;color:#a78bfa;font-size:0.85rem;z-index:1000;box-shadow:0 8px 24px rgba(124,58,237,.25);">
+            style="position:fixed;bottom:1.5rem;right:1.5rem;background:#f0faf5;border:1px solid #b7e1cb;color:#2d6a4f;padding:.7rem 1.1rem;font-size:.8rem;z-index:1000;border-radius:1px;">
             ✓ {{ $cartMessage }}
         </div>
     @endif
 
     {{-- Page header --}}
-    <div style="flex-shrink:0;display:flex;align-items:center;gap:1rem;margin-bottom:0.75rem;">
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
         <a href="{{ route('catalog') }}"
-            style="display:inline-flex;align-items:center;gap:0.4rem;color:#64748b;text-decoration:none;font-size:0.85rem;padding:0.4rem 0.75rem;border:1px solid #1e1e30;border-radius:6px;transition:all .15s;"
-            onmouseover="this.style.borderColor='#7c3aed';this.style.color='#a78bfa'"
-            onmouseout="this.style.borderColor='#1e1e30';this.style.color='#64748b'">
+            style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aaa;text-decoration:none;transition:color .15s;"
+            onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#aaa'">
             ← Catálogo
         </a>
+        <div style="width:1px;height:14px;background:#e0ddd8;"></div>
         <div>
-            <h1 style="color:#e2e8f0;font-size:1.4rem;font-weight:700;margin:0;">Provador Virtual 3D</h1>
-            <p style="color:#64748b;font-size:0.82rem;margin:0;">Arrasta para rodar · Escolhe design e cor</p>
+            <div style="font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b8b4ae;">Provador</div>
+            <h1 style="font-size:1rem;font-weight:600;color:#1a1a1a;margin:0;letter-spacing:-.01em;">Provador Virtual 3D</h1>
         </div>
     </div>
 
     {{-- Main 3-panel layout --}}
-    <div style="display:grid;grid-template-columns:230px 1fr 260px;gap:1.25rem;flex:1;min-height:0;">
+    <div style="display:grid;grid-template-columns:220px 1fr 250px;grid-template-rows:1fr;gap:1.25rem;flex:1;min-height:0;overflow:hidden;">
 
         {{-- LEFT: Design list --}}
-        <div
-            style="background:#111120;border:1px solid #1e1e30;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;">
-            <div style="padding:0.75rem 1rem;border-bottom:1px solid #1e1e30;">
-                <p
-                    style="color:#a78bfa;font-size:0.78rem;font-weight:600;margin:0;text-transform:uppercase;letter-spacing:.05em;">
-                    Designs</p>
+        <div style="background:#eeecea;border:1px solid #e0ddd8;border-radius:2px;overflow:hidden;display:flex;flex-direction:column;min-height:0;height:100%;">
+            <div style="padding:.75rem 1rem;border-bottom:1px solid #e0ddd8;">
+                <p style="font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin:0;">Designs</p>
             </div>
-            <div style="overflow-y:auto;flex:1;padding:0.5rem;">
+            <div data-lenis-prevent style="overflow-y:auto;flex:1;padding:.4rem;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;">
                 @foreach ($designs as $design)
                     @php
-                        $imgUrl = \Illuminate\Support\Str::startsWith($design->image_url, 'tshirt_images_private/')
-                            ? route('private-image', $design->image_url)
-                            : asset('storage/' . $design->image_url);
+                        if (\Illuminate\Support\Str::startsWith($design->image_url, 'tshirt_images_private/')) {
+                            $imgUrl = route('private-image', $design->image_url);
+                        } elseif (str_contains($design->image_url, '/')) {
+                            $imgUrl = asset('storage/' . $design->image_url);
+                        } else {
+                            $imgUrl = asset('storage/tshirt_images/' . $design->image_url);
+                        }
                         $isSelected = $selectedImageId === $design->id;
                     @endphp
                     <button wire:click="selectDesign({{ $design->id }})"
-                        style="width:100%;background:{{ $isSelected ? 'rgba(124,58,237,.18)' : 'transparent' }};border:1px solid {{ $isSelected ? '#7c3aed' : 'transparent' }};border-radius:8px;padding:0.5rem;cursor:pointer;display:flex;align-items:center;gap:0.65rem;margin-bottom:0.3rem;transition:all .15s;text-align:left;"
-                        onmouseover="if(!{{ $isSelected ? 'true' : 'false' }})this.style.background='rgba(255,255,255,.04)'"
+                        style="width:100%;background:{{ $isSelected ? '#fff' : 'transparent' }};border:1px solid {{ $isSelected ? '#7c6fa0' : 'transparent' }};border-radius:1px;padding:.45rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;margin-bottom:.25rem;transition:all .15s;text-align:left;"
+                        onmouseover="if(!{{ $isSelected ? 'true' : 'false' }})this.style.background='rgba(0,0,0,.04)'"
                         onmouseout="if(!{{ $isSelected ? 'true' : 'false' }})this.style.background='transparent'">
-                        {{-- Actual design image thumbnail --}}
-                        <div
-                            style="width:52px;height:52px;flex-shrink:0;background:#0d0d1a;border-radius:7px;overflow:hidden;border:1px solid rgba(255,255,255,.06);">
+                        <div style="width:48px;height:48px;flex-shrink:0;background:#f5f4f1;border-radius:1px;overflow:hidden;border:1px solid #e0ddd8;">
                             <img src="{{ $imgUrl }}" alt="{{ $design->name }}"
                                 style="width:100%;height:100%;object-fit:cover;display:block;"
-                                onerror="this.parentElement.innerHTML='<span style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#333;font-size:1.2rem;\'>◈</span>'">
+                                onerror="this.parentElement.innerHTML='<span style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#ccc;font-size:1rem;\'>?</span>'">
                         </div>
                         <div style="min-width:0;flex:1;">
-                            <p
-                                style="color:{{ $isSelected ? '#e2e8f0' : '#94a3b8' }};font-size:0.80rem;font-weight:{{ $isSelected ? '600' : '400' }};margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            <p style="color:{{ $isSelected ? '#1a1a1a' : '#888' }};font-size:.78rem;font-weight:{{ $isSelected ? '600' : '400' }};margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                                 {{ $design->name }}</p>
                             @if ($design->category)
-                                <span style="color:#64748b;font-size:0.70rem;">{{ $design->category->name }}</span>
+                                <span style="color:#b8b4ae;font-size:.68rem;">{{ $design->category->name }}</span>
                             @endif
                         </div>
                     </button>
@@ -66,63 +64,68 @@
 
         {{-- CENTER: 3D Viewport --}}
         <div wire:ignore
-            style="background:#0a0a0f;border:1px solid #1e1e30;border-radius:12px;position:relative;overflow:hidden;min-height:0;">
-            <div
-                style="position:absolute;inset:0;background-image:linear-gradient(rgba(124,58,237,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;">
-            </div>
+            style="background:#eeecea;border:1px solid #e0ddd8;border-radius:2px;position:relative;overflow:hidden;min-height:0;box-shadow:inset 0 2px 20px rgba(0,0,0,.06);">
             <canvas id="tshirt-canvas" style="width:100%;height:100%;display:block;cursor:grab;"></canvas>
             <div id="drag-hint"
-                style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);border:1px solid #1e1e30;border-radius:20px;padding:0.3rem 0.9rem;color:#64748b;font-size:0.75rem;pointer-events:none;transition:opacity .5s;">
+                style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.75);border:1px solid #d8d5d0;border-radius:20px;padding:.3rem .9rem;color:#aaa;font-size:.72rem;pointer-events:none;transition:opacity .5s;backdrop-filter:blur(4px);">
                 ↔ Arrasta para rodar
             </div>
             <button id="reset-btn" onclick="window.resetRotation && window.resetRotation()"
-                style="position:absolute;top:1rem;right:1rem;background:rgba(17,17,32,.85);border:1px solid #1e1e30;border-radius:6px;color:#64748b;font-size:0.75rem;padding:0.35rem 0.7rem;cursor:pointer;transition:all .15s;"
-                onmouseover="this.style.borderColor='#7c3aed';this.style.color='#a78bfa'"
-                onmouseout="this.style.borderColor='#1e1e30';this.style.color='#64748b'">
+                style="position:absolute;top:.75rem;right:.75rem;background:rgba(255,255,255,.8);border:1px solid #d8d5d0;color:#888;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .65rem;cursor:pointer;transition:all .15s;border-radius:1px;backdrop-filter:blur(4px);"
+                onmouseover="this.style.borderColor='#7c6fa0';this.style.color='#7c6fa0'"
+                onmouseout="this.style.borderColor='#d8d5d0';this.style.color='#888'">
                 ⟳ Resetar
             </button>
         </div>
 
         {{-- RIGHT: Controls --}}
-        <div
-            style="background:#111120;border:1px solid #1e1e30;border-radius:12px;padding:0.85rem;display:flex;flex-direction:column;gap:0.6rem;">
+        <div style="background:#eeecea;border:1px solid #e0ddd8;border-radius:2px;padding:.85rem;display:flex;flex-direction:column;gap:.75rem;">
             @if ($selectedImage)
-                <div style="border-bottom:1px solid #1e1e30;padding-bottom:0.55rem;">
-                    <p
-                        style="color:#a78bfa;font-size:0.68rem;font-weight:600;margin:0 0 0.2rem;text-transform:uppercase;letter-spacing:.05em;">
-                        Design</p>
-                    <p
-                        style="color:#e2e8f0;font-size:0.85rem;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                <div style="border-bottom:1px solid #e0ddd8;padding-bottom:.6rem;">
+                    <p style="font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin:0 0 .2rem;">Design</p>
+                    <p style="color:#1a1a1a;font-size:.84rem;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                         {{ $selectedImage->name }}</p>
                 </div>
             @endif
 
+            {{-- Side toggle --}}
             <div>
-                <p
-                    style="color:#a78bfa;font-size:0.68rem;font-weight:600;margin:0 0 0.35rem;text-transform:uppercase;letter-spacing:.05em;">
-                    Cor</p>
-                <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+                <p style="font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin:0 0 .5rem;">Posição da estampa</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e0ddd8;border:1px solid #e0ddd8;border-radius:1px;overflow:hidden;">
+                    <button wire:click="selectSide('front')"
+                        style="background:{{ $selectedSide === 'front' ? '#1a1a1a' : '#fff' }};color:{{ $selectedSide === 'front' ? '#f5f4f1' : '#888' }};border:none;padding:.45rem .5rem;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.3rem;">
+                        <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor" style="opacity:.7;"><rect x="1" y="0" width="8" height="12" rx="1"/><rect x="3" y="3" width="4" height="4" rx=".5" fill="{{ $selectedSide === 'front' ? '#eeecea' : '#ccc' }}"/></svg>
+                        Frente
+                    </button>
+                    <button wire:click="selectSide('back')"
+                        style="background:{{ $selectedSide === 'back' ? '#1a1a1a' : '#fff' }};color:{{ $selectedSide === 'back' ? '#f5f4f1' : '#888' }};border:none;padding:.45rem .5rem;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.3rem;">
+                        <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor" style="opacity:.7;"><rect x="1" y="0" width="8" height="12" rx="1"/></svg>
+                        Verso
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <p style="font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin:0 0 .4rem;">Cor</p>
+                <div style="display:flex;gap:.35rem;flex-wrap:wrap;">
                     @foreach ($colors as $color)
                         <button wire:click="selectColor('{{ $color->code }}')" title="{{ $color->name }}"
-                            style="width:26px;height:26px;border-radius:50%;background:{{ $color->code }};border:2px solid {{ $selectedColor === $color->code ? '#a78bfa' : 'transparent' }};cursor:pointer;box-shadow:{{ $selectedColor === $color->code ? '0 0 0 2px #7c3aed' : 'inset 0 0 0 1px rgba(255,255,255,.2)' }};transition:all .15s;outline:none;">
+                            style="width:24px;height:24px;border-radius:50%;background:#{{ $color->code }};border:2px solid {{ $selectedColor === $color->code ? '#7c6fa0' : 'transparent' }};cursor:pointer;box-shadow:{{ $selectedColor === $color->code ? '0 0 0 2px #7c6fa0' : 'inset 0 0 0 1px rgba(0,0,0,.12)' }};transition:all .15s;outline:none;">
                         </button>
                     @endforeach
                 </div>
                 @if ($selectedColor)
                     @php $colorName = $colors->firstWhere('code', $selectedColor)?->name @endphp
-                    <p style="color:#64748b;font-size:0.72rem;margin:0.2rem 0 0;">{{ $colorName ?? $selectedColor }}
-                    </p>
+                    <p style="color:#aaa;font-size:.7rem;margin:.25rem 0 0;">{{ $colorName ?? $selectedColor }}</p>
                 @endif
             </div>
 
             <div>
-                <p
-                    style="color:#a78bfa;font-size:0.68rem;font-weight:600;margin:0 0 0.35rem;text-transform:uppercase;letter-spacing:.05em;">
-                    Tamanho</p>
-                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+                <p style="font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin:0 0 .4rem;">Tamanho</p>
+                <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
                     @foreach (['XS', 'S', 'M', 'L', 'XL'] as $size)
                         <button wire:click="$set('selectedSize', '{{ $size }}')"
-                            style="background:{{ $selectedSize === $size ? '#7c3aed' : '#1a1a2e' }};color:{{ $selectedSize === $size ? 'white' : '#94a3b8' }};border:1px solid {{ $selectedSize === $size ? '#7c3aed' : '#1e1e30' }};border-radius:6px;padding:0.25rem 0.55rem;font-size:0.78rem;cursor:pointer;font-weight:500;transition:all .15s;min-width:34px;">
+                            style="background:{{ $selectedSize === $size ? '#1a1a1a' : 'transparent' }};color:{{ $selectedSize === $size ? '#f5f4f1' : '#888' }};border:1px solid {{ $selectedSize === $size ? '#1a1a1a' : '#d8d5d0' }};padding:.25rem .5rem;font-size:.75rem;font-weight:600;cursor:pointer;border-radius:1px;transition:all .15s;min-width:32px;font-family:inherit;">
                             {{ $size }}
                         </button>
                     @endforeach
@@ -130,81 +133,72 @@
             </div>
 
             <div>
-                <p
-                    style="color:#a78bfa;font-size:0.68rem;font-weight:600;margin:0 0 0.35rem;text-transform:uppercase;letter-spacing:.05em;">
-                    Quantidade</p>
-                <div style="display:flex;align-items:center;gap:0.4rem;">
+                <p style="font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b8b4ae;margin:0 0 .4rem;">Quantidade</p>
+                <div style="display:flex;align-items:center;gap:.4rem;">
                     <button wire:click="$set('qty', max(1, $qty - 1))"
-                        style="background:#1a1a2e;border:1px solid #1e1e30;border-radius:6px;width:30px;height:30px;color:#94a3b8;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">−</button>
-                    <span
-                        style="color:#e2e8f0;font-weight:600;min-width:1.8rem;text-align:center;font-size:0.9rem;">{{ $qty }}</span>
+                        style="background:transparent;border:1px solid #d8d5d0;width:28px;height:28px;color:#888;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;border-radius:1px;font-family:inherit;transition:all .15s;"
+                        onmouseover="this.style.borderColor='#1a1a1a'" onmouseout="this.style.borderColor='#d8d5d0'">−</button>
+                    <span style="color:#1a1a1a;font-weight:600;min-width:1.8rem;text-align:center;font-size:.88rem;">{{ $qty }}</span>
                     <button wire:click="$set('qty', min(99, $qty + 1))"
-                        style="background:#1a1a2e;border:1px solid #1e1e30;border-radius:6px;width:30px;height:30px;color:#94a3b8;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">+</button>
+                        style="background:transparent;border:1px solid #d8d5d0;width:28px;height:28px;color:#888;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;border-radius:1px;font-family:inherit;transition:all .15s;"
+                        onmouseover="this.style.borderColor='#1a1a1a'" onmouseout="this.style.borderColor='#d8d5d0'">+</button>
                 </div>
             </div>
 
             @if ($prices)
-                <div style="background:#1a1a2e;border-radius:7px;padding:0.55rem 0.65rem;">
-                    <div
-                        style="display:flex;justify-content:space-between;color:#94a3b8;font-size:0.78rem;margin-bottom:0.2rem;">
-                        <span>Preço/un</span>
-                        <span
-                            style="color:#a78bfa;font-weight:600;">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
+                <div style="background:#f5f4f1;border:1px solid #e0ddd8;padding:.6rem .75rem;font-size:.75rem;border-radius:1px;">
+                    <div style="display:flex;justify-content:space-between;color:#888;margin-bottom:.2rem;">
+                        <span>Por unidade</span>
+                        <span style="color:#1a1a1a;font-weight:700;">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
                     </div>
                     @if ($qty >= $prices->qty_discount)
-                        <div
-                            style="display:flex;justify-content:space-between;color:#4ade80;font-size:0.72rem;margin-bottom:0.2rem;">
+                        <div style="display:flex;justify-content:space-between;color:#2d6a4f;font-size:.7rem;margin-bottom:.2rem;">
                             <span>✓ Desc. quantidade</span>
                             <span>€{{ number_format($prices->unit_price_catalog_discount, 2) }}/un</span>
                         </div>
                     @endif
-                    <div style="height:1px;background:#2d2d45;margin:0.35rem 0;"></div>
-                    <div
-                        style="display:flex;justify-content:space-between;color:#e2e8f0;font-weight:700;font-size:0.95rem;">
+                    <div style="height:1px;background:#e0ddd8;margin:.35rem 0;"></div>
+                    <div style="display:flex;justify-content:space-between;color:#1a1a1a;font-weight:700;font-size:.9rem;">
                         <span>Total</span>
-                        <span
-                            style="color:#a78bfa;">€{{ number_format(($qty >= $prices->qty_discount ? $prices->unit_price_catalog_discount : $prices->unit_price_catalog) * $qty, 2) }}</span>
+                        <span>€{{ number_format(($qty >= $prices->qty_discount ? $prices->unit_price_catalog_discount : $prices->unit_price_catalog) * $qty, 2) }}</span>
                     </div>
                 </div>
             @endif
 
             <button wire:click="addToCart"
-                style="width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;border:none;border-radius:8px;padding:0.65rem;font-size:0.88rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:auto;"
-                onmouseover="this.style.background='linear-gradient(135deg,#8b5cf6,#7c3aed)';this.style.transform='translateY(-1px)'"
-                onmouseout="this.style.background='linear-gradient(135deg,#7c3aed,#6d28d9)';this.style.transform='translateY(0)'">
+                style="width:100%;background:#1a1a1a;color:#f5f4f1;border:none;padding:.65rem;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:auto;border-radius:1px;font-family:inherit;"
+                onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1a1a1a'">
                 + Adicionar ao carrinho
             </button>
         </div>
     </div>
 
-    {{-- Three.js – wire:ignore prevents re-execution on Livewire re-renders --}}
+    {{-- Three.js + GLTFLoader – wire:ignore prevents re-execution on Livewire re-renders --}}
     <div wire:ignore>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+        <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
+        <script src="https://unpkg.com/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
         <script>
             (function() {
                 const designImages = {
                     @foreach ($designs as $design)
-                        {{ $design->id }}: "{{ \Illuminate\Support\Str::startsWith($design->image_url, 'tshirt_images_private/') ? route('private-image', $design->image_url) : asset('storage/' . $design->image_url) }}",
+                        @php
+                            if (\Illuminate\Support\Str::startsWith($design->image_url, 'tshirt_images_private/')) {
+                                $jsImgUrl = route('private-image', $design->image_url);
+                            } elseif (str_contains($design->image_url, '/')) {
+                                $jsImgUrl = asset('storage/' . $design->image_url);
+                            } else {
+                                $jsImgUrl = asset('storage/tshirt_images/' . $design->image_url);
+                            }
+                        @endphp
+                        {{ $design->id }}: "{{ $jsImgUrl }}",
                     @endforeach
                 };
 
                 const CSS_COLORS = {
-                    'white': '#f2f2f2',
-                    'black': '#111111',
-                    'gray': '#888888',
-                    'grey': '#888888',
-                    'red': '#cc2222',
-                    'blue': '#2255cc',
-                    'green': '#1a8a3a',
-                    'yellow': '#ddb000',
-                    'purple': '#7c3aed',
-                    'pink': '#e63888',
-                    'orange': '#d95200',
-                    'navy': '#1a2f5a',
-                    'brown': '#6b3410',
-                    'cyan': '#0891b2',
-                    'lime': '#65a30d',
-                    'indigo': '#4338ca',
+                    'white':'#f2f2f2','black':'#111111','gray':'#888888','grey':'#888888',
+                    'red':'#cc2222','blue':'#2255cc','green':'#1a8a3a','yellow':'#ddb000',
+                    'purple':'#7c3aed','pink':'#e63888','orange':'#d95200','navy':'#1a2f5a',
+                    'brown':'#6b3410','cyan':'#0891b2','lime':'#65a30d','indigo':'#4338ca',
                 };
 
                 function toHex(c) {
@@ -212,199 +206,192 @@
                     const lc = c.toLowerCase();
                     if (CSS_COLORS[lc]) return CSS_COLORS[lc];
                     if (c.startsWith('#')) return c;
-                    return c;
+                    // bare 6-char hex (stored in DB without #)
+                    if (/^[0-9a-fA-F]{6}$/.test(c)) return '#' + c;
+                    return '#f2f2f2';
                 }
 
                 let currentDesignId = {{ $selectedImageId ?? 'null' }};
                 let currentColor = "{{ $selectedColor }}";
+                let currentSide = "{{ $selectedSide }}";
                 let loadedImages = {};
 
                 // ── Renderer ──
                 const canvas = document.getElementById('tshirt-canvas');
                 const container = canvas.parentElement;
-                const renderer = new THREE.WebGLRenderer({
-                    canvas,
-                    antialias: true
-                });
+                const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                renderer.setClearColor(0x0a0a0f, 1);
+                renderer.setClearColor(0xeeecea, 1);
                 renderer.shadowMap.enabled = true;
                 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
                 const scene = new THREE.Scene();
-
-                const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 50);
-                camera.position.set(0, 0.34, 1.8);
-                camera.lookAt(0, 0.34, 0);
+                const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+                camera.position.set(0, 0, 3.5);
+                camera.lookAt(0, 0, 0);
 
                 // ── Lighting ──
-                scene.add(new THREE.AmbientLight(0x7755aa, 0.55));
-                const keyLight = new THREE.DirectionalLight(0xfff6e8, 1.6);
-                keyLight.position.set(2.5, 4.0, 3.5);
+                scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+                const keyLight = new THREE.DirectionalLight(0xfff8f4, 1.1);
+                keyLight.position.set(3, 5, 4);
                 keyLight.castShadow = true;
                 keyLight.shadow.mapSize.set(2048, 2048);
-                keyLight.shadow.radius = 4;
                 scene.add(keyLight);
-                const fillLight = new THREE.DirectionalLight(0xaabbff, 0.5);
-                fillLight.position.set(-3, 1.5, 2);
+                const fillLight = new THREE.DirectionalLight(0xdde8ff, 0.35);
+                fillLight.position.set(-4, 2, 2);
                 scene.add(fillLight);
-                const rimLight = new THREE.DirectionalLight(0x6644dd, 0.4);
-                rimLight.position.set(0, 3, -3.5);
+                const rimLight = new THREE.DirectionalLight(0xffffff, 0.2);
+                rimLight.position.set(0, 4, -5);
                 scene.add(rimLight);
-                const topLight = new THREE.DirectionalLight(0xffffff, 0.25);
-                topLight.position.set(0, 6, 0);
-                scene.add(topLight);
 
-                // ── Shirt group (rotation target, shirt centered at y≈0.34) ──
                 const shirtGroup = new THREE.Group();
                 scene.add(shirtGroup);
 
-                function buildShirt() {
-                    while (shirtGroup.children.length) shirtGroup.remove(shirtGroup.children[0]);
+                // ── GLTF Model ──
+                let gltfScene   = null;
+                let shirtMeshes = [];
+                let modelBounds = null;
+                let chestUV     = null; // Cached UV hit on front chest
+                let backUV      = null; // Cached UV hit on back
 
-                    const hex = toHex(currentColor);
-                    const base = new THREE.Color(hex);
-                    const dark = base.clone().multiplyScalar(0.78);
-                    const vdark = base.clone().multiplyScalar(0.63);
+                const loader = new THREE.GLTFLoader();
+                loader.load(
+                    '/tshirt/scene.gltf',
+                    function(gltf) {
+                        gltfScene = gltf.scene;
 
-                    const matBase = new THREE.MeshStandardMaterial({
-                        color: base,
-                        roughness: 0.86,
-                        metalness: 0
-                    });
-                    const matDark = new THREE.MeshStandardMaterial({
-                        color: dark,
-                        roughness: 0.88
-                    });
-                    const matVDark = new THREE.MeshStandardMaterial({
-                        color: vdark,
-                        roughness: 0.92
-                    });
+                        // Auto-scale & center
+                        const box    = new THREE.Box3().setFromObject(gltfScene);
+                        const center = box.getCenter(new THREE.Vector3());
+                        const size   = box.getSize(new THREE.Vector3());
+                        const scale  = 1.6 / Math.max(size.x, size.y, size.z);
 
-                    function sm(geo, mat) {
-                        const m = new THREE.Mesh(geo, mat || matBase);
-                        m.castShadow = true;
-                        shirtGroup.add(m);
-                        return m;
+                        gltfScene.scale.setScalar(scale);
+                        gltfScene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+
+                        modelBounds = new THREE.Box3().setFromObject(gltfScene);
+
+                        // Collect meshes, replace materials
+                        shirtMeshes = [];
+                        gltfScene.traverse(child => {
+                            if (!child.isMesh) return;
+                            shirtMeshes.push(child);
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                            // Keep a MeshStandardMaterial per mesh — we'll paint texture into it
+                            const mat = new THREE.MeshStandardMaterial({ roughness: 0.75, metalness: 0.02 });
+                            child.material = Array.isArray(child.material) ? child.material.map(() => mat.clone()) : mat;
+                        });
+
+                        // Force matrix world update so raycaster can work
+                        gltfScene.updateMatrixWorld(true);
+
+                        // Find UV hit point on front and back chest
+                        chestUV = findChestUV();
+                        backUV  = findBackUV();
+
+                        // Fit camera — push back enough to see the whole shirt small
+                        const mc   = modelBounds.getCenter(new THREE.Vector3());
+                        const ms   = modelBounds.getSize(new THREE.Vector3());
+                        const dist = ms.y * 2.2; // enough margin around the shirt
+                        camera.position.set(0, mc.y, dist);
+                        camera.lookAt(0, mc.y, 0);
+
+                        shirtGroup.add(gltfScene);
+
+                        // Render initial state
+                        rebuildTextures();
+                    },
+                    undefined,
+                    err => console.error('GLTF error:', err)
+                );
+
+                // ── Find UV at chest via raycasting ──
+                function _raycastChest(fromZ, dirZ) {
+                    if (!modelBounds || shirtMeshes.length === 0) return null;
+                    const h      = modelBounds.max.y - modelBounds.min.y;
+                    const chestY = modelBounds.min.y + h * 0.65;
+                    const ray    = new THREE.Raycaster(
+                        new THREE.Vector3(0, chestY, fromZ),
+                        new THREE.Vector3(0, 0, dirZ)
+                    );
+                    const sorted = [...shirtMeshes].sort((a, b) =>
+                        b.geometry.attributes.position.count - a.geometry.attributes.position.count
+                    );
+                    for (const mesh of sorted) {
+                        const hits = ray.intersectObject(mesh, false);
+                        if (hits.length > 0 && hits[0].uv) return hits[0].uv.clone();
+                    }
+                    return null;
+                }
+                // Model's front faces -Z: shoot from -Z toward +Z to hit front chest
+                function findChestUV() { return _raycastChest(-5, 1); }
+                function findBackUV()  { return _raycastChest(5, -1); }
+
+                // ── Build per-mesh canvas texture (color + design baked in) ──
+                function buildTexture(mesh) {
+                    const size = 1024;
+                    const cv   = document.createElement('canvas');
+                    cv.width = cv.height = size;
+                    const ctx  = cv.getContext('2d');
+
+                    // Base shirt color
+                    ctx.fillStyle = toHex(currentColor);
+                    ctx.fillRect(0, 0, size, size);
+
+                    // Paint design at the UV chest position (front or back)
+                    const activeUV = currentSide === 'back' ? backUV : chestUV;
+                    if (activeUV && currentDesignId && loadedImages[currentDesignId]?.complete) {
+                        const img   = loadedImages[currentDesignId];
+                        const dSize = size * 0.26;
+                        // UV (0,0) = bottom-left; canvas (0,0) = top-left → flip Y
+                        const px = activeUV.x * size - dSize / 2;
+                        const py = (1 - activeUV.y) * size - dSize / 2;
+                        ctx.drawImage(img, px, py, dSize, dSize);
                     }
 
-                    // Body (hem at y=0, collar at y=0.682)
-                    const bodyPts = [
-                        new THREE.Vector2(0.192, 0.000),
-                        new THREE.Vector2(0.180, 0.080),
-                        new THREE.Vector2(0.183, 0.165),
-                        new THREE.Vector2(0.198, 0.285),
-                        new THREE.Vector2(0.214, 0.390),
-                        new THREE.Vector2(0.222, 0.495),
-                        new THREE.Vector2(0.216, 0.588),
-                        new THREE.Vector2(0.182, 0.645),
-                        new THREE.Vector2(0.152, 0.668),
-                        new THREE.Vector2(0.140, 0.682),
-                    ];
-                    sm(new THREE.LatheGeometry(bodyPts, 40));
+                    const tex = new THREE.CanvasTexture(cv);
+                    tex.flipY = true; // default, matches Three.js UV convention
+                    return tex;
+                }
 
-                    // Shoulder caps
-                    [-1, 1].forEach(side => {
-                        const cap = sm(new THREE.SphereGeometry(0.098, 18, 14), matDark);
-                        cap.position.set(side * 0.248, 0.610, 0);
-                        cap.scale.set(0.88, 0.75, 0.82);
+                function rebuildTextures() {
+                    shirtMeshes.forEach(mesh => {
+                        const tex  = buildTexture(mesh);
+                        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                        mats.forEach(m => {
+                            m.color.set(0xffffff); // texture carries the color
+                            m.map = tex;
+                            m.needsUpdate = true;
+                        });
                     });
-
-                    // Sleeves
-                    [-1, 1].forEach(side => {
-                        const slv = sm(new THREE.CylinderGeometry(0.096, 0.080, 0.255, 20), matDark);
-                        slv.position.set(side * 0.350, 0.572, 0.005);
-                        slv.rotation.z = side * 1.40;
-                        slv.rotation.x = 0.04;
-                        const cuff = sm(new THREE.TorusGeometry(0.082, 0.012, 8, 22), matVDark);
-                        cuff.position.set(side * 0.434, 0.478, 0.005);
-                        cuff.rotation.z = side * 1.40;
-                        cuff.rotation.x = 0.04;
-                    });
-
-                    // Collar
-                    const collar = new THREE.Mesh(new THREE.TorusGeometry(0.112, 0.022, 10, 32, Math.PI * 1.88), matVDark);
-                    collar.rotation.x = Math.PI / 2;
-                    collar.position.set(0, 0.692, 0);
-                    shirtGroup.add(collar);
-
-                    const frontSeam = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.060, 6), matDark);
-                    frontSeam.position.set(0, 0.650, 0.142);
-                    shirtGroup.add(frontSeam);
-
-                    sm(new THREE.CylinderGeometry(0.196, 0.198, 0.024, 36), matDark).position.set(0, 0.010, 0);
-
-                    // Design decal
-                    const designImg = currentDesignId && loadedImages[currentDesignId] ? loadedImages[currentDesignId] :
-                        null;
-                    if (designImg && designImg.complete && designImg.naturalWidth > 0) {
-                        const tc = document.createElement('canvas');
-                        tc.width = 512;
-                        tc.height = 512;
-                        const ctx = tc.getContext('2d');
-                        ctx.clearRect(0, 0, 512, 512);
-                        ctx.drawImage(designImg, 0, 0, 512, 512);
-                        const tex = new THREE.CanvasTexture(tc);
-                        const decal = new THREE.Mesh(
-                            new THREE.PlaneGeometry(0.30, 0.30),
-                            new THREE.MeshStandardMaterial({
-                                map: tex,
-                                transparent: true,
-                                alphaTest: 0.04,
-                                depthWrite: false,
-                                roughness: 0.84,
-                                polygonOffset: true,
-                                polygonOffsetFactor: -1
-                            })
-                        );
-                        decal.position.set(0, 0.370, 0.198);
-                        shirtGroup.add(decal);
-                    }
                 }
 
                 // ── Image loading ──
                 function loadDesignImage(id, url, cb) {
-                    if (loadedImages[id] !== undefined) {
-                        cb(loadedImages[id]);
-                        return;
-                    }
+                    if (loadedImages[id] !== undefined) { cb(loadedImages[id]); return; }
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
-                    img.onload = () => {
-                        loadedImages[id] = img;
-                        cb(img);
-                    };
-                    img.onerror = () => {
-                        loadedImages[id] = null;
-                        cb(null);
-                    };
+                    img.onload  = () => { loadedImages[id] = img;  cb(img);  };
+                    img.onerror = () => { loadedImages[id] = null; cb(null); };
                     img.src = url;
                 }
 
                 function updateScene() {
                     if (currentDesignId && designImages[currentDesignId]) {
-                        loadDesignImage(currentDesignId, designImages[currentDesignId], () => buildShirt());
+                        loadDesignImage(currentDesignId, designImages[currentDesignId], () => rebuildTextures());
                     } else {
-                        buildShirt();
+                        rebuildTextures();
                     }
                 }
 
-                updateScene();
-
                 // ── Rotation Controls ──
-                let isPointerDown = false,
-                    prevX = 0,
-                    prevY = 0;
-                let rotY = 0,
-                    rotX = 0,
-                    autoRotate = true;
+                let isPointerDown = false, prevX = 0, prevY = 0;
+                let rotY = 0, rotX = 0, autoRotate = true;
 
                 canvas.addEventListener('pointerdown', e => {
-                    isPointerDown = true;
-                    prevX = e.clientX;
-                    prevY = e.clientY;
-                    autoRotate = false;
-                    canvas.style.cursor = 'grabbing';
+                    isPointerDown = true; prevX = e.clientX; prevY = e.clientY;
+                    autoRotate = false; canvas.style.cursor = 'grabbing';
                     document.getElementById('drag-hint').style.opacity = '0';
                 });
                 window.addEventListener('pointermove', e => {
@@ -412,65 +399,43 @@
                     rotY += (e.clientX - prevX) * 0.012;
                     rotX += (e.clientY - prevY) * 0.007;
                     rotX = Math.max(-0.52, Math.min(0.52, rotX));
-                    shirtGroup.rotation.y = rotY;
-                    shirtGroup.rotation.x = rotX;
-                    prevX = e.clientX;
-                    prevY = e.clientY;
+                    shirtGroup.rotation.y = rotY; shirtGroup.rotation.x = rotX;
+                    prevX = e.clientX; prevY = e.clientY;
                 });
-                window.addEventListener('pointerup', () => {
-                    isPointerDown = false;
-                    canvas.style.cursor = 'grab';
-                });
+                window.addEventListener('pointerup', () => { isPointerDown = false; canvas.style.cursor = 'grab'; });
 
                 canvas.addEventListener('touchstart', e => {
                     if (e.touches.length !== 1) return;
-                    isPointerDown = true;
-                    prevX = e.touches[0].clientX;
-                    prevY = e.touches[0].clientY;
-                    autoRotate = false;
-                    document.getElementById('drag-hint').style.opacity = '0';
-                }, {
-                    passive: true
-                });
+                    isPointerDown = true; prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+                    autoRotate = false; document.getElementById('drag-hint').style.opacity = '0';
+                }, { passive: true });
                 canvas.addEventListener('touchmove', e => {
                     if (!isPointerDown || e.touches.length !== 1) return;
                     rotY += (e.touches[0].clientX - prevX) * 0.012;
                     rotX += (e.touches[0].clientY - prevY) * 0.007;
                     rotX = Math.max(-0.52, Math.min(0.52, rotX));
-                    shirtGroup.rotation.y = rotY;
-                    shirtGroup.rotation.x = rotX;
-                    prevX = e.touches[0].clientX;
-                    prevY = e.touches[0].clientY;
-                }, {
-                    passive: true
-                });
-                canvas.addEventListener('touchend', () => {
-                    isPointerDown = false;
-                });
+                    shirtGroup.rotation.y = rotY; shirtGroup.rotation.x = rotX;
+                    prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+                }, { passive: true });
+                canvas.addEventListener('touchend', () => { isPointerDown = false; });
 
                 window.resetRotation = () => {
-                    rotY = 0;
-                    rotX = 0;
-                    shirtGroup.rotation.set(0, 0, 0);
-                    autoRotate = true;
+                    rotY = 0; rotX = 0; shirtGroup.rotation.set(0, 0, 0); autoRotate = true;
                 };
 
                 // ── Resize ──
                 function resize() {
-                    const w = container.clientWidth,
-                        h = container.clientHeight;
+                    const w = container.clientWidth, h = container.clientHeight;
                     if (!w || !h) return;
                     renderer.setSize(w, h);
                     camera.aspect = w / h;
                     camera.updateProjectionMatrix();
                 }
                 new ResizeObserver(resize).observe(container);
-                resize();
-                setTimeout(resize, 150);
+                resize(); setTimeout(resize, 150);
 
                 // ── Render Loop ──
                 let lastTime = 0;
-
                 function animate(t) {
                     requestAnimationFrame(animate);
                     const dt = Math.min((t - lastTime) / 1000, 0.05);
@@ -484,18 +449,24 @@
                 animate(0);
 
                 // ── Livewire State Sync ──
-                let lastColor = currentColor,
-                    lastDesign = currentDesignId;
+                let lastColor = currentColor, lastDesign = currentDesignId, lastSide = currentSide;
                 setInterval(() => {
                     const c = document.getElementById('livewire-color')?.value;
                     const d = parseInt(document.getElementById('livewire-design')?.value) || null;
-                    if (c !== lastColor || d !== lastDesign) {
-                        currentColor = c;
-                        currentDesignId = d;
-                        lastColor = c;
-                        lastDesign = d;
-                        updateScene();
+                    const s = document.getElementById('livewire-side')?.value || 'front';
+                    let changed = false;
+                    if (c !== lastColor) { currentColor = c; lastColor = c; changed = true; }
+                    if (d !== lastDesign) { currentDesignId = d; lastDesign = d; changed = true; }
+                    if (s !== lastSide) {
+                        currentSide = s; lastSide = s; changed = true;
+                        // Model front faces -Z: PI shows front, 0 shows back
+                        autoRotate = false;
+                        rotY = s === 'front' ? Math.PI : 0;
+                        rotX = 0;
+                        shirtGroup.rotation.y = rotY;
+                        shirtGroup.rotation.x = rotX;
                     }
+                    if (changed) updateScene();
                 }, 150);
             })();
         </script>
@@ -503,4 +474,5 @@
 
     <input type="hidden" id="livewire-color" value="{{ $selectedColor }}">
     <input type="hidden" id="livewire-design" value="{{ $selectedImageId ?? '' }}">
+    <input type="hidden" id="livewire-side" value="{{ $selectedSide }}">
 </div>

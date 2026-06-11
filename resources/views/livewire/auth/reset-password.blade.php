@@ -1,32 +1,39 @@
 <x-layouts.auth :title="__('Nova password')">
-    <h2 style="color:#e2e8f0;font-size:1.3rem;font-weight:600;margin:0 0 1.5rem;">Definir nova password</h2>
+    <div style="margin-bottom:2rem;">
+        <div style="font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b8b4ae;margin-bottom:.9rem;">Recuperação</div>
+        <h1 style="font-size:1.9rem;font-weight:300;letter-spacing:-.03em;line-height:1.1;color:#1a1a1a;">Nova<br><em style="font-style:italic;font-weight:700;">password.</em></h1>
+    </div>
 
-    <form method="POST" action="{{ route('password.store') }}" style="display:flex;flex-direction:column;gap:1rem;">
+    <div style="height:1px;background:#e0ddd8;margin-bottom:1.75rem;"></div>
+
+    <form method="POST" action="{{ route('password.store') }}" style="display:flex;flex-direction:column;gap:1.25rem;">
         @csrf
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
         <div>
-            <label style="display:block;color:#94a3b8;font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Email</label>
+            <label class="auth-label">E-mail</label>
             <input name="email" type="email" value="{{ old('email', $request->email) }}" required
-                   style="width:100%;background:#1a1a2e;border:1px solid #1e1e30;border-radius:6px;padding:0.6rem 0.75rem;color:#e2e8f0;font-size:0.9rem;outline:none;box-sizing:border-box;">
-            @error('email') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.3rem;">{{ $message }}</p> @enderror
+                   class="auth-input {{ $errors->has('email') ? 'is-error' : '' }}">
+            @error('email') <p class="auth-error">{{ $message }}</p> @enderror
         </div>
+
         <div>
-            <label style="display:block;color:#94a3b8;font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Nova password</label>
+            <label class="auth-label">Nova password</label>
             <input name="password" type="password" required autocomplete="new-password"
-                   style="width:100%;background:#1a1a2e;border:1px solid #1e1e30;border-radius:6px;padding:0.6rem 0.75rem;color:#e2e8f0;font-size:0.9rem;outline:none;box-sizing:border-box;"
-                   onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#1e1e30'">
-            @error('password') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.3rem;">{{ $message }}</p> @enderror
+                   class="auth-input {{ $errors->has('password') ? 'is-error' : '' }}"
+                   placeholder="Min. 8 caracteres">
+            @error('password') <p class="auth-error">{{ $message }}</p> @enderror
         </div>
+
         <div>
-            <label style="display:block;color:#94a3b8;font-size:0.8rem;font-weight:500;margin-bottom:0.4rem;">Confirmar password</label>
-            <input name="password_confirmation" type="password" required
-                   style="width:100%;background:#1a1a2e;border:1px solid #1e1e30;border-radius:6px;padding:0.6rem 0.75rem;color:#e2e8f0;font-size:0.9rem;outline:none;box-sizing:border-box;"
-                   onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#1e1e30'">
+            <label class="auth-label">Confirmar password</label>
+            <input name="password_confirmation" type="password" required autocomplete="new-password"
+                   class="auth-input"
+                   placeholder="••••••••">
         </div>
-        <button type="submit"
-                style="width:100%;background:#7c3aed;color:white;border:none;border-radius:6px;padding:0.7rem;font-size:0.9rem;font-weight:600;cursor:pointer;">
-            Guardar nova password
-        </button>
+
+        <div style="margin-top:.5rem;">
+            <button type="submit" class="auth-btn auth-btn-full">Guardar password</button>
+        </div>
     </form>
 </x-layouts.auth>

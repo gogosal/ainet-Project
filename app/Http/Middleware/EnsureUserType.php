@@ -22,7 +22,12 @@ class EnsureUserType
         }
 
         if (!in_array($request->user()->user_type, $types)) {
-            abort(403, 'Acesso não autorizado.');
+            $fallback = match($request->user()->user_type) {
+                'A' => route('admin.dashboard'),
+                'F' => route('employee.orders'),
+                default => route('catalog'),
+            };
+            return redirect($fallback);
         }
 
         return $next($request);

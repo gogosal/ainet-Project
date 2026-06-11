@@ -23,3 +23,12 @@ yarn-error.log
 /.vscode
 /.zed
 /.playwright-mcp
+/.superpowers
+.DS_Store
+catalog-after.png
+prices-fixed.png
+stats-fixed.png
+tryon-after.png
+tryon-fixed.png
+tryon-full.png
+tryon-shirt-only.png

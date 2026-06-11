@@ -121,8 +121,8 @@ class MyImagesPage extends Component
 
     public function render()
     {
-        $customerId = Auth::user()->customer->id;
-        $images = TshirtImage::where('customer_id', $customerId)
+        $customerId = Auth::user()->customer?->id;
+        $images = TshirtImage::where('customer_id', $customerId ?? 0)
             ->when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%"))
             ->with('category')
             ->latest()
