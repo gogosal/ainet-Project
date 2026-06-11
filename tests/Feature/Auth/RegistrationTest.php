@@ -31,10 +31,11 @@ class RegistrationTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'gender' => 'M',
         ]);
 
         $response->assertSessionHasNoErrors()
-            ->assertRedirect(route('dashboard', absolute: false));
+            ->assertRedirect(route('catalog', absolute: false));
 
         $this->assertAuthenticated();
     }

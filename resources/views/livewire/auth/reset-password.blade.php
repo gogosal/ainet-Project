@@ -6,7 +6,7 @@
 
     <div style="height:1px;background:#e0ddd8;margin-bottom:1.75rem;"></div>
 
-    <form method="POST" action="{{ route('password.store') }}" style="display:flex;flex-direction:column;gap:1.25rem;">
+    <form method="POST" action="{{ route('password.update') }}" style="display:flex;flex-direction:column;gap:1.25rem;">
         @csrf
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 

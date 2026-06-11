@@ -30,6 +30,8 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'user_type' => 'C',
+            'gender' => fake()->randomElement(['M', 'F']),
         ];
     }
 
@@ -40,6 +42,15 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function withTwoFactor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'two_factor_secret' => encrypt('JBSWY3DPEHPK3PXP'),
+            'two_factor_recovery_codes' => encrypt(json_encode([])),
+            'two_factor_confirmed_at' => now(),
         ]);
     }
 }

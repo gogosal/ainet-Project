@@ -7,13 +7,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Passkeys\PasskeyAuthenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\VerifyEmailNotification;
 use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, SoftDeletes, TwoFactorAuthenticatable, PasskeyAuthenticatable;
 
     protected $fillable = [
         'name', 'email', 'password', 'user_type', 'gender', 'blocked', 'photo_url', 'custom'
