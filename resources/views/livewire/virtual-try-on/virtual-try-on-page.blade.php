@@ -35,7 +35,7 @@
             <div style="overflow-y:auto;flex:1;padding:0.5rem;">
                 @foreach ($designs as $design)
                     @php
-                        $imgUrl = \Illuminate\Support\Str::startsWith($design->image_url, 'tshirt_images/')
+                        $imgUrl = \Illuminate\Support\Str::startsWith($design->image_url, 'tshirt_images_private/')
                             ? route('private-image', $design->image_url)
                             : asset('storage/' . $design->image_url);
                         $isSelected = $selectedImageId === $design->id;
@@ -184,7 +184,7 @@
             (function() {
                 const designImages = {
                     @foreach ($designs as $design)
-                        {{ $design->id }}: "{{ \Illuminate\Support\Str::startsWith($design->image_url, 'tshirt_images/') ? route('private-image', $design->image_url) : asset('storage/' . $design->image_url) }}",
+                        {{ $design->id }}: "{{ \Illuminate\Support\Str::startsWith($design->image_url, 'tshirt_images_private/') ? route('private-image', $design->image_url) : asset('storage/' . $design->image_url) }}",
                     @endforeach
                 };
 

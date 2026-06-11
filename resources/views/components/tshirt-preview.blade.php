@@ -52,7 +52,7 @@
         {{-- Design image overlay --}}
         @if ($imageUrl)
             <image
-                href="{{ Str::startsWith($imageUrl, 'tshirt_images/') ? route('private-image', $imageUrl) : asset('storage/' . $imageUrl) }}"
+                href="{{ Str::startsWith($imageUrl, 'tshirt_images_private/') ? route('private-image', $imageUrl) : asset('storage/' . $imageUrl) }}"
                 x="60" y="70" width="80" height="80" preserveAspectRatio="xMidYMid meet"
                 style="mix-blend-mode:multiply;" clip-path="url(#design-clip-{{ md5($imageUrl ?? 'none') }})" />
         @endif

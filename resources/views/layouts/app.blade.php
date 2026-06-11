@@ -20,9 +20,13 @@
 
             {{-- Logo --}}
             <a href="{{ route('catalog') }}"
-                style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
-                <span style="color:#a78bfa; font-size:1.5rem;">⬡</span>
-                <span style="color:#e2e8f0; font-weight:700; font-size:1.1rem; letter-spacing:-0.02em;">FunShirt</span>
+                style="display:flex; align-items:center; gap:0.6rem; text-decoration:none; flex-shrink:0;">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(124,58,237,.35);">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/>
+                    </svg>
+                </div>
+                <span style="color:#e2e8f0; font-weight:700; font-size:1.1rem; letter-spacing:-0.025em;">FunShirt</span>
             </a>
 
             {{-- Nav --}}
@@ -44,7 +48,7 @@
                 @auth
                     {{-- Lógica para o botão de Encomendas (Todos veem, mas com links diferentes) --}}
                     @php
-                        $ordersRoute = match (auth()->user()->type) {
+                        $ordersRoute = match (auth()->user()->user_type) {
                             'A' => route('admin.orders'),
                             'F' => route('employee.orders'),
                             default => route('orders.index'),
