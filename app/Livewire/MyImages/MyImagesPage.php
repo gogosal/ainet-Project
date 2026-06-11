@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\MyImages;
 
 use Livewire\Component;
@@ -27,7 +28,10 @@ class MyImagesPage extends Component
     // Delete confirm
     public ?int $deleteId = null;
 
-    public function updatedSearch(): void { $this->resetPage(); }
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
 
     public function openCreate(): void
     {
@@ -76,13 +80,13 @@ class MyImagesPage extends Component
                 'category_id' => $this->modalCategoryId,
             ];
             if ($this->modalImage) {
-                if ($image->image_url) Storage::disk('private')->delete($image->image_url);
-                $data['image_url'] = $this->modalImage->store('tshirt_images_private', 'private');
+                if ($image->image_url) Storage::disk('public')->delete($image->image_url);
+                $data['image_url'] = $this->modalImage->store('tshirt_images', 'public');
             }
             $image->update($data);
             session()->flash('success', 'Imagem atualizada.');
         } else {
-            $path = $this->modalImage->store('tshirt_images_private', 'private');
+            $path = $this->modalImage->store('tshirt_images', 'public');
             TshirtImage::create([
                 'customer_id' => $customerId,
                 'category_id' => $this->modalCategoryId,
@@ -97,13 +101,19 @@ class MyImagesPage extends Component
         $this->resetPage();
     }
 
-    public function confirmDelete(int $id): void { $this->deleteId = $id; }
-    public function cancelDelete(): void { $this->deleteId = null; }
+    public function confirmDelete(int $id): void
+    {
+        $this->deleteId = $id;
+    }
+    public function cancelDelete(): void
+    {
+        $this->deleteId = null;
+    }
 
     public function deleteImage(): void
     {
         $image = TshirtImage::where('customer_id', Auth::user()->customer->id)->findOrFail($this->deleteId);
-        if ($image->image_url) Storage::disk('private')->delete($image->image_url);
+        if ($image->image_url) Storage::disk('public')->delete($image->image_url);
         $image->delete();
         $this->deleteId = null;
         session()->flash('success', 'Imagem eliminada.');

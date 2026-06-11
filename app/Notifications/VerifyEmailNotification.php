@@ -7,13 +7,15 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class VerifyEmailNotification extends VerifyEmail
 {
-    protected function buildMailMessage($url): MailMessage
+    public function toMail($notifiable): MailMessage
     {
+        $url = $this->verificationUrl($notifiable);
+
         return (new MailMessage)
             ->subject('FunShirt — Verifica o teu email')
             ->view('emails.verify-email', [
                 'url'  => $url,
-                'name' => $this->notifiable->name,
+                'name' => $notifiable->name,
             ]);
     }
 }

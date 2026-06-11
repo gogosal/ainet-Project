@@ -7,13 +7,18 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class ResetPasswordNotification extends ResetPassword
 {
-    protected function buildMailMessage($url): MailMessage
+    public function toMail($notifiable): MailMessage
     {
+        $url = url(route('password.reset', [
+            'token' => $this->token,
+            'email' => $notifiable->getEmailForPasswordReset(),
+        ], false));
+
         return (new MailMessage)
             ->subject('FunShirt — Recuperação de password')
             ->view('emails.reset-password', [
                 'url'  => $url,
-                'name' => $this->notifiable->name,
+                'name' => $notifiable->name,
             ]);
     }
 }
