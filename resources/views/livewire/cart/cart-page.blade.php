@@ -75,8 +75,7 @@
                                     <div>
                                         <label style="display:block;color:#64748b;font-size:0.72rem;font-weight:500;margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:.04em;">Qtd</label>
                                         <div style="display:flex;align-items:center;gap:0.3rem;">
-                                            <button wire:click="$set('editQtys.{{ $item['index'] }}', {{ max(0, ($editQtys[$item['index']] ?? 1) - 1) }})"
-                                                    wire:change="updateItem({{ $item['index'] }})"
+                                            <button wire:click="decrementQty({{ $item['index'] }})"
                                                     style="background:#1a1a2e;border:1px solid #1e1e30;border-radius:4px;width:28px;height:28px;color:#94a3b8;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">−</button>
                                             <input type="number" wire:model="editQtys.{{ $item['index'] }}" wire:change="updateItem({{ $item['index'] }})"
                                                    min="0" max="99"

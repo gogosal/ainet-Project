@@ -22,6 +22,22 @@ class CartPage extends Component
         }
     }
 
+    public function decrementQty(int $index): void
+    {
+        $current = (int) ($this->editQtys[$index] ?? 1);
+        $next    = $current - 1;
+
+        if ($next <= 0) {
+            app(CartService::class)->remove($index);
+            $this->dispatch('cart-updated');
+            $this->reinitEdits();
+            return;
+        }
+
+        $this->editQtys[$index] = $next;
+        $this->updateItem($index);
+    }
+
     public function updateItem(int $index): void
     {
         $this->validate([
