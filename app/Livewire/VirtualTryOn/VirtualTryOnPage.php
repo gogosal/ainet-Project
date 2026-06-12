@@ -2,33 +2,31 @@
 
 namespace App\Livewire\VirtualTryOn;
 
+use App\Models\Category;
 use App\Models\Color;
 use App\Models\Price;
 use App\Models\TshirtImage;
 use App\Services\CartService;
 use Livewire\Component;
 use Livewire\Attributes\Url;
+use Illuminate\Support\Facades\Auth;
 
 class VirtualTryOnPage extends Component
 {
     public ?int $selectedImageId = null;
-
+    public string $search = '';
+    public ?int $categoryId = null;
     #[Url(as: 'color')]
     public string $selectedColor = '';
-
     #[Url(as: 'size')]
     public string $selectedSize = 'M';
-
     #[Url(as: 'side')]
     public string $selectedSide = 'front';
-
     public int $qty = 1;
     public string $cartMessage = '';
 
     public function mount(): void
     {
-        // Read design from URL once on arrival (e.g. clicking "3D" in catalog).
-        // Not persisted via #[Url] so refreshing always starts with no design.
         if ($this->selectedImageId === null) {
             $d = request()->query('design');
             if ($d && ctype_digit((string)$d)) {
@@ -41,10 +39,10 @@ class VirtualTryOnPage extends Component
                 ?? Color::where('name', 'Branco')->first()?->code
                 ?? 'fafafa';
         }
-        if (!in_array($this->selectedSize, ['XS','S','M','L','XL'])) {
+        if (!in_array($this->selectedSize, ['XS', 'S', 'M', 'L', 'XL'])) {
             $this->selectedSize = 'M';
         }
-        if (!in_array($this->selectedSide, ['front','back'])) {
+        if (!in_array($this->selectedSide, ['front', 'back'])) {
             $this->selectedSide = 'front';
         }
     }
@@ -91,19 +89,49 @@ class VirtualTryOnPage extends Component
 
     public function render()
     {
-        $designs = TshirtImage::whereNull('customer_id')
+        $customerId = Auth::check() ? Auth::user()->customer?->id : null;
+
+        $allDesigns = TshirtImage::query()
+            ->where(function ($q) use ($customerId) {
+                $q->whereNull('customer_id');
+                if ($customerId) {
+                    $q->orWhere('customer_id', $customerId);
+                }
+            })
+            ->get();
+
+        $designs = TshirtImage::query()
+            ->where(function ($q) use ($customerId) {
+                $q->whereNull('customer_id');
+                if ($customerId) {
+                    $q->orWhere('customer_id', $customerId);
+                }
+            })
+            ->when($this->search, fn($q) => $q->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('description', 'like', '%' . $this->search . '%');
+            }))
+            ->when($this->categoryId === -1, fn($q) => $q->whereNull('category_id'))
+            ->when($this->categoryId > 0, fn($q) => $q->where('category_id', $this->categoryId))
             ->with('category')
             ->orderBy('name')
             ->get();
 
+        $categories = Category::orderBy('name')->get();
         $colors = Color::orderBy('name')->get();
         $prices = Price::current();
+
         $selectedImage = $this->selectedImageId
             ? TshirtImage::find($this->selectedImageId)
             : null;
 
         return view('livewire.virtual-try-on.virtual-try-on-page', compact(
-            'designs', 'colors', 'prices', 'selectedImage'
+            'designs',
+            'allDesigns',
+            'categories',
+            'colors',
+            'prices',
+            'selectedImage'
         ))->layout('layouts.app', ['title' => 'Provador 3D']);
     }
 }

@@ -22,6 +22,19 @@ class CartPage extends Component
         }
     }
 
+    public function incrementQty(int $index): void
+    {
+        $current = (int) ($this->editQtys[$index] ?? 1);
+        $next = $current + 1;
+
+        if ($next > 99) {
+            return;
+        }
+
+        $this->editQtys[$index] = $next;
+        $this->updateItem($index);
+    }
+
     public function decrementQty(int $index): void
     {
         $current = (int) ($this->editQtys[$index] ?? 1);

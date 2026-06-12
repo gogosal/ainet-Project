@@ -22,7 +22,7 @@ use App\Livewire\Admin\AdminStatisticsPage;
 use App\Livewire\VirtualTryOn\VirtualTryOnPage;
 
 // Home landing page
-Route::get('/', fn() => view('landing'))->name('home');
+Route::get('/', fn() => view('landing'))->name('landing');
 
 // Serve private tshirt images (custom uploads)
 Route::get('/private-image/{filename}', function (string $filename) {

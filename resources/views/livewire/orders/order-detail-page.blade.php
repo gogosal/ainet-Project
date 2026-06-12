@@ -1,86 +1,108 @@
-<div>
-    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;">
-        <a href="{{ route('orders.index') }}" style="color:#aaa;text-decoration:none;font-size:0.85rem;" onmouseover="this.style.color='#7c6fa0'" onmouseout="this.style.color='#aaa'">← As minhas encomendas</a>
-        <span style="color:#e0ddd8;">|</span>
-        <h1 style="color:#1a1a1a;font-size:1.3rem;font-weight:700;margin:0;">Encomenda #{{ $order->id }}</h1>
+<div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    {{-- Header --}}
+    <div class="flex items-center gap-4 mb-8">
+        <a href="{{ route('orders.index') }}"
+            class="text-gray-500 hover:text-indigo-600 transition-colors text-sm font-medium no-underline">
+            &larr; As minhas encomendas
+        </a>
+        <span class="text-gray-300">|</span>
+        <h1 class="text-2xl font-bold text-gray-900 m-0">Encomenda #{{ $order->id }}</h1>
         <x-status-badge :status="$order->status" />
     </div>
 
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
-        {{-- Items --}}
-        <div>
-            <div style="background:#ffffff;border:1px solid #e0ddd8;border-radius:2px;overflow:hidden;">
-                <div style="padding:1rem 1.5rem;border-bottom:1px solid #e0ddd8;">
-                    <h3 style="color:#1a1a1a;font-size:0.95rem;font-weight:600;margin:0;">Artigos encomendados</h3>
+    {{-- Layout Grid --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {{-- Coluna Principal: Items --}}
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 class="text-gray-800 text-lg font-semibold m-0">Artigos encomendados</h3>
                 </div>
-                @foreach($order->items as $item)
-                    <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid #0d0d1a;">
-                        <x-tshirt-preview
-                            :colorCode="$item->color_code"
-                            :imageUrl="$item->tshirtImage?->image_url"
-                            size="64px" />
-                        <div style="flex:1;">
-                            <p style="color:#1a1a1a;font-size:0.9rem;font-weight:500;margin:0 0 0.2rem;">{{ $item->tshirtImage?->name ?? 'Design removido' }}</p>
-                            <p style="color:#aaa;font-size:0.8rem;margin:0;">{{ $item->color?->name ?? $item->color_code }} · {{ $item->size }} · {{ $item->qty }}x</p>
+
+                <div class="divide-y divide-gray-100">
+                    @foreach ($order->items as $item)
+                        <div class="flex items-center gap-4 px-6 py-4">
+                            <x-tshirt-preview :colorCode="$item->color_code" :imageUrl="$item->tshirtImage?->image_url" size="64px"
+                                class="rounded-md border border-gray-100" />
+
+                            <div class="flex-1">
+                                <p class="text-gray-900 font-medium mb-1">
+                                    {{ $item->tshirtImage?->name ?? 'Design removido' }}</p>
+                                <p class="text-gray-500 text-sm m-0">{{ $item->color?->name ?? $item->color_code }}
+                                    &middot; {{ $item->size }} &middot; {{ $item->qty }}x</p>
+                            </div>
+
+                            <div class="text-right">
+                                <p class="text-indigo-900 font-semibold text-lg m-0">
+                                    &euro;{{ number_format($item->sub_total, 2) }}</p>
+                                <p class="text-gray-400 text-xs mt-1 m-0">
+                                    &euro;{{ number_format($item->unit_price, 2) }}/un</p>
+                            </div>
                         </div>
-                        <div style="text-align:right;">
-                            <p style="color:#7c6fa0;font-weight:600;font-size:0.9rem;margin:0;">€{{ number_format($item->sub_total, 2) }}</p>
-                            <p style="color:#aaa;font-size:0.75rem;margin:0.15rem 0 0;">€{{ number_format($item->unit_price, 2) }}/un</p>
-                        </div>
-                    </div>
-                @endforeach
-                <div style="padding:1rem 1.5rem;display:flex;justify-content:flex-end;align-items:center;gap:0.5rem;">
-                    <span style="color:#888;font-size:0.9rem;">Total:</span>
-                    <span style="color:#7c6fa0;font-weight:700;font-size:1.15rem;">€{{ number_format($order->total_price, 2) }}</span>
+                    @endforeach
+                </div>
+
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end items-center gap-3">
+                    <span class="text-gray-500 font-medium">Total:</span>
+                    <span
+                        class="text-indigo-900 font-bold text-2xl">&euro;{{ number_format($order->total_price, 2) }}</span>
                 </div>
             </div>
 
-            @if($order->reason_for_cancellation)
-                <div style="margin-top:1rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:1rem 1.25rem;">
-                    <p style="color:#f87171;font-size:0.82rem;font-weight:500;margin:0 0 0.25rem;">Motivo de anulação:</p>
-                    <p style="color:#888;font-size:0.85rem;margin:0;">{{ $order->reason_for_cancellation }}</p>
+            @if ($order->reason_for_cancellation)
+                <div class="bg-red-50 border border-red-200 rounded-xl p-5">
+                    <p class="text-red-600 font-semibold text-sm mb-1">Motivo de anulação:</p>
+                    <p class="text-red-800 text-sm m-0">{{ $order->reason_for_cancellation }}</p>
                 </div>
             @endif
         </div>
 
-        {{-- Details --}}
-        <div style="display:flex;flex-direction:column;gap:1rem;">
-            <div style="background:#ffffff;border:1px solid #e0ddd8;border-radius:2px;padding:1.25rem;">
-                <h4 style="color:#888;font-size:0.75rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin:0 0 0.75rem;">Detalhes</h4>
-                <div style="display:flex;flex-direction:column;gap:0.5rem;">
-                    <div style="display:flex;justify-content:space-between;">
-                        <span style="color:#aaa;font-size:0.82rem;">Data</span>
-                        <span style="color:#888;font-size:0.82rem;">{{ $order->date->format('d/m/Y') }}</span>
+        {{-- Coluna Lateral: Detalhes --}}
+        <div class="space-y-6">
+
+            {{-- Detalhes Card --}}
+            <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <h4 class="text-gray-400 text-xs uppercase tracking-wider font-bold mb-4 m-0">Detalhes</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 text-sm">Data</span>
+                        <span class="text-gray-900 text-sm font-medium">{{ $order->date->format('d/m/Y') }}</span>
                     </div>
-                    <div style="display:flex;justify-content:space-between;">
-                        <span style="color:#aaa;font-size:0.82rem;">NIF</span>
-                        <span style="color:#888;font-size:0.82rem;">{{ $order->nif ?: '—' }}</span>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 text-sm">NIF</span>
+                        <span class="text-gray-900 text-sm font-medium">{{ $order->nif ?: '—' }}</span>
                     </div>
-                    <div style="display:flex;justify-content:space-between;">
-                        <span style="color:#aaa;font-size:0.82rem;">Pagamento</span>
-                        <span style="color:#888;font-size:0.82rem;">{{ $order->payment_type }}</span>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 text-sm">Pagamento</span>
+                        <span class="text-gray-900 text-sm font-medium">{{ $order->payment_type }}</span>
                     </div>
                 </div>
             </div>
 
-            <div style="background:#ffffff;border:1px solid #e0ddd8;border-radius:2px;padding:1.25rem;">
-                <h4 style="color:#888;font-size:0.75rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin:0 0 0.5rem;">Morada de entrega</h4>
-                <p style="color:#888;font-size:0.85rem;margin:0;line-height:1.5;">{{ $order->address }}</p>
+            {{-- Morada Card --}}
+            <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <h4 class="text-gray-400 text-xs uppercase tracking-wider font-bold mb-3 m-0">Morada de entrega</h4>
+                <p class="text-gray-700 text-sm leading-relaxed m-0">{{ $order->address }}</p>
             </div>
 
-            @if($order->notes)
-                <div style="background:#ffffff;border:1px solid #e0ddd8;border-radius:2px;padding:1.25rem;">
-                    <h4 style="color:#888;font-size:0.75rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin:0 0 0.5rem;">Notas</h4>
-                    <p style="color:#888;font-size:0.85rem;margin:0;">{{ $order->notes }}</p>
+            {{-- Notas Card --}}
+            @if ($order->notes)
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <h4 class="text-gray-400 text-xs uppercase tracking-wider font-bold mb-3 m-0">Notas da Encomenda
+                    </h4>
+                    <p class="text-gray-700 text-sm m-0">{{ $order->notes }}</p>
                 </div>
             @endif
 
-            @if($order->isClosed() && $order->receipt_url)
+            {{-- Botão Recibo PDF --}}
+            @if ($order->isClosed() && $order->receipt_url)
                 <a href="{{ route('orders.receipt', $order->id) }}" target="_blank"
-                   style="display:block;text-align:center;background:rgba(124,111,160,.2);color:#7c6fa0;text-decoration:none;border:1px solid rgba(124,111,160,.2);border-radius:8px;padding:0.75rem;font-size:0.875rem;font-weight:600;">
+                    class="block w-full text-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors rounded-xl py-3 text-sm font-semibold shadow-sm">
                     📄 Descarregar recibo PDF
                 </a>
             @endif
         </div>
+
     </div>
 </div>

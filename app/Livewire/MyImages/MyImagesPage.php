@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str; // Importante para gerar o nome aleatório
 use App\Models\TshirtImage;
 use App\Models\Category;
 
@@ -79,22 +80,41 @@ class MyImagesPage extends Component
                 'description' => $this->modalDescription ?: null,
                 'category_id' => $this->modalCategoryId,
             ];
+
             if ($this->modalImage) {
-                if ($image->image_url) Storage::disk('public')->delete($image->image_url);
-                $data['image_url'] = $this->modalImage->store('tshirt_images', 'public');
+                // Apaga a imagem antiga do disco
+                if ($image->image_url) {
+                    Storage::disk('public')->delete('tshirt_images/' . basename($image->image_url));
+                }
+
+                // Formata o nome para ficar igual aos do Seeder (ex: 00012_aBcDeFgHiJ.png)
+                $extensao = $this->modalImage->getClientOriginalExtension();
+                $nomePersonalizado = sprintf('%05d_%s.%s', $customerId, Str::random(10), $extensao);
+
+                // Guarda com o nome exato e atualiza o array de dados para a DB
+                $this->modalImage->storeAs('tshirt_images', $nomePersonalizado, 'public');
+                $data['image_url'] = $nomePersonalizado;
             }
+
             $image->update($data);
-            session()->flash('success', 'Imagem atualizada.');
+            session()->flash('success', 'Imagem atualizada com sucesso.');
         } else {
-            $path = $this->modalImage->store('tshirt_images', 'public');
+            // Formata o nome para ficar igual aos do Seeder
+            $extensao = $this->modalImage->getClientOriginalExtension();
+            $nomePersonalizado = sprintf('%05d_%s.%s', $customerId, Str::random(10), $extensao);
+
+            // Guarda com o nome exato no disco
+            $this->modalImage->storeAs('tshirt_images', $nomePersonalizado, 'public');
+
             TshirtImage::create([
                 'customer_id' => $customerId,
                 'category_id' => $this->modalCategoryId,
                 'name' => $this->modalName,
                 'description' => $this->modalDescription ?: null,
-                'image_url' => $path,
+                'image_url' => $nomePersonalizado,
             ]);
-            session()->flash('success', 'Imagem adicionada.');
+
+            session()->flash('success', 'Imagem adicionada com sucesso.');
         }
 
         $this->showModal = false;
@@ -105,6 +125,7 @@ class MyImagesPage extends Component
     {
         $this->deleteId = $id;
     }
+
     public function cancelDelete(): void
     {
         $this->deleteId = null;
@@ -113,7 +134,12 @@ class MyImagesPage extends Component
     public function deleteImage(): void
     {
         $image = TshirtImage::where('customer_id', Auth::user()->customer->id)->findOrFail($this->deleteId);
-        if ($image->image_url) Storage::disk('public')->delete($image->image_url);
+
+        // Garante que o ficheiro é apagado da pasta correta
+        if ($image->image_url) {
+            Storage::disk('public')->delete('tshirt_images/' . basename($image->image_url));
+        }
+
         $image->delete();
         $this->deleteId = null;
         session()->flash('success', 'Imagem eliminada.');

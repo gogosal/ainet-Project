@@ -37,7 +37,7 @@ class CheckoutPage extends Component
 
     protected function paymentRefRules(): string
     {
-        return match($this->paymentType) {
+        return match ($this->paymentType) {
             'Visa'    => 'required|string|regex:/^4[0-9]{15}$/',
             'PayPal'  => 'required|email',
             'MB WAY'  => 'required|string|regex:/^9[0-9]{8}$/',
@@ -52,13 +52,13 @@ class CheckoutPage extends Component
         $this->validate([
             'nif'        => 'required|string|regex:/^[0-9]{9}$/',
             'address'    => 'required|string|min:5',
-            'paymentType'=> 'required|in:Visa,PayPal,MB WAY',
+            'paymentType' => 'required|in:Visa,PayPal,MB WAY',
             'paymentRef' => $this->paymentRefRules(),
         ], [
             'nif.required'       => 'O NIF é obrigatório.',
             'nif.regex'          => 'O NIF deve ter exatamente 9 dígitos.',
             'address.required'   => 'A morada é obrigatória.',
-            'paymentRef.required'=> 'A referência de pagamento é obrigatória.',
+            'paymentRef.required' => 'A referência de pagamento é obrigatória.',
             'paymentRef.regex'   => $this->paymentType === 'Visa'
                 ? 'Cartão Visa inválido (16 dígitos, começa por 4).'
                 : ($this->paymentType === 'MB WAY' ? 'Número MB WAY inválido (9 dígitos, começa por 9).' : 'Email PayPal inválido.'),
@@ -75,7 +75,6 @@ class CheckoutPage extends Component
 
         $total = $cart->total();
 
-        // Process payment
         $payment = app(PaymentService::class)->process($this->paymentType, $this->paymentRef, $total);
 
         if (!$payment['success']) {
@@ -83,7 +82,6 @@ class CheckoutPage extends Component
             return null;
         }
 
-        // Create order in transaction
         $order = DB::transaction(function () use ($items, $total) {
             $customer = auth()->user()->customer;
 
@@ -118,11 +116,9 @@ class CheckoutPage extends Component
         app(CartService::class)->clear();
         $this->dispatch('cart-updated');
 
-        // Send pending email (G6 - dispatched as a job or direct mail)
         try {
             \Mail::to(auth()->user()->email)->send(new \App\Mail\OrderPendingMail($order));
         } catch (\Exception $e) {
-            // Non-critical: log but don't fail
             \Log::error('Failed to send pending email: ' . $e->getMessage());
         }
 

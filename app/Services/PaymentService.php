@@ -6,27 +6,26 @@ use Illuminate\Support\Facades\Http;
 
 class PaymentService
 {
-    private const API_URL = 'https://ainet-payments-api.vercel.app/api/payments';
-
     public function process(string $type, string $reference, float $value): array
     {
-        try {
-            $response = Http::timeout(10)->post(self::API_URL, [
-                'type'      => $type,
-                'reference' => $reference,
-                'value'     => round($value, 2),
-            ]);
+        $response = Http::post('https://ainet-payments-api.vercel.app/api/payments', [
+            'type' => $type,
+            'reference' => $reference,
+            'value' => round($value, 2),
+        ]);
 
-            if ($response->status() === 201) {
-                return ['success' => true];
-            }
-
-            $body = $response->json();
-            $message = $body['message'] ?? 'Pagamento recusado pela plataforma.';
-
-            return ['success' => false, 'message' => $message];
-        } catch (\Exception $e) {
-            return ['success' => false, 'message' => 'Erro ao comunicar com a plataforma de pagamentos.'];
+        if ($response->successful() && $response->status() === 201) {
+            return ['success' => true];
         }
+
+        if ($response->status() === 422) {
+            $errorDetails = $response->json('message') ?? 'Pagamento rejeitado pela entidade externa.';
+            return ['success' => false, 'message' => $errorDetails];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Erro de comunicação com a plataforma de pagamentos. Tente mais tarde.'
+        ];
     }
 }

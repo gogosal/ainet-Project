@@ -8,6 +8,7 @@ class OrderItem extends Model
 {
     public $timestamps = false;
     protected $fillable = ['order_id', 'tshirt_image_id', 'color_code', 'size', 'qty', 'unit_price', 'sub_total', 'custom'];
+    protected $casts = ['custom' => 'json',];
 
     protected function casts(): array
     {
