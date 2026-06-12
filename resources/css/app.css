@@ -17,6 +17,18 @@
     --color-purple: #7c3aed;
     --color-purple-light: #a78bfa;
 
+    /* FunShirt brand palette */
+    --color-fs-dark: #1a1a1a;
+    --color-fs-light: #f5f4f1;
+    --color-fs-bg: #eeecea;
+    --color-fs-border: #e0ddd8;
+    --color-fs-mid: #ccc9c3;
+    --color-fs-muted: #b8b4ae;
+    --color-fs-gray: #888888;
+    --color-fs-purple: #7c6fa0;
+    --color-fs-green: #2d6a4f;
+    --color-fs-red: #c0392b;
+
     --color-zinc-50: #f8fafc;
     --color-zinc-100: #f1f5f9;
     --color-zinc-200: #e2e8f0;
