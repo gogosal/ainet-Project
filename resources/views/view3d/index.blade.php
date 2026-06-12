@@ -34,11 +34,43 @@
         <div
             class="grid gap-5 flex-1 min-h-0 overflow-hidden [grid-template-columns:220px_1fr_250px] [grid-template-rows:1fr]">
 
-            {{-- LEFT: Design list --}}
-            <div class="bg-fs-bg border border-fs-border rounded-[2px] overflow-hidden flex flex-col min-h-0 h-full">
-                <div class="px-4 py-3 border-b border-fs-border shrink-0">
+            {{-- LEFT: Design list + Filtros --}}
+            <div class="bg-fs-bg border border-fs-border rounded-[2px] overflow-hidden flex flex-col min-h-0 h-full"
+                x-data="{}">
+
+                {{-- Filtros --}}
+                <form method="GET" action="{{ route('view3d') }}" x-ref="filterForm"
+                    class="p-3 bg-fs-bg border-b border-fs-border flex flex-col gap-3 shrink-0">
+                    <div>
+                        <label class="block text-[0.55rem] font-bold tracking-[0.14em] uppercase text-fs-muted mb-1">Pesquisa</label>
+                        <input type="text" name="search" value="{{ $search }}" placeholder="Pesquisar..."
+                            @input.debounce.400ms="$refs.filterForm.submit()"
+                            class="w-full bg-transparent border-0 border-b border-[#ccc9c3] py-1 px-0 text-fs-dark text-[0.8rem] outline-none font-[inherit] transition-colors duration-200 focus:border-fs-purple focus:ring-0">
+                    </div>
+                    <div>
+                        <label class="block text-[0.55rem] font-bold tracking-[0.14em] uppercase text-fs-muted mb-1">Categoria</label>
+                        <div class="relative">
+                            <select name="category_id" @change="$refs.filterForm.submit()"
+                                class="w-full bg-white border border-fs-border text-fs-dark text-[0.75rem] py-2 pl-3 pr-8 rounded-[1px] outline-none appearance-none cursor-pointer transition-colors duration-200 focus:border-fs-purple focus:ring-0">
+                                <option value="" {{ $categoryId === '' ? 'selected' : '' }}>Todas</option>
+                                @foreach ($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                @endforeach
+                                <option value="-1" {{ $categoryId === '-1' ? 'selected' : '' }}>Sem categoria</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-fs-muted">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="py-[0.75rem] px-4 border-b border-fs-border shrink-0">
                     <p class="text-[0.58rem] font-bold tracking-[0.14em] uppercase text-fs-muted m-0">Designs</p>
                 </div>
+
                 <div data-lenis-prevent
                     class="overflow-y-auto flex-1 p-[0.4rem] [-webkit-overflow-scrolling:touch] [overscroll-behavior:contain] [touch-action:pan-y]">
                     @foreach ($designs as $design)

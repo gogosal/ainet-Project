@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CartItemRequest;
+use App\Models\Category;
 use App\Models\Color;
 use App\Models\Price;
 use App\Models\TshirtImage;
@@ -15,11 +16,21 @@ class View3dController extends Controller
 {
     public function index(Request $request): View
     {
-        $designs = TshirtImage::whereNull('customer_id')
-            ->with('category')
-            ->orderBy('name')
-            ->get();
+        $search = $request->query('search', '');
+        $categoryId = $request->query('category_id', '');
 
+        $query = TshirtImage::whereNull('customer_id')->with('category')->orderBy('name');
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+        if ($categoryId === '-1') {
+            $query->whereNull('category_id');
+        } elseif ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        $designs = $query->get();
+
+        $categories = Category::orderBy('name')->get();
         $colors = Color::orderBy('name')->get();
         $prices = Price::current();
 
@@ -44,13 +55,16 @@ class View3dController extends Controller
 
         return view('view3d.index', compact(
             'designs',
+            'categories',
             'colors',
             'prices',
             'selectedImage',
             'selectedImageId',
             'selectedColor',
             'selectedSize',
-            'selectedSide'
+            'selectedSide',
+            'search',
+            'categoryId'
         ));
     }
 
