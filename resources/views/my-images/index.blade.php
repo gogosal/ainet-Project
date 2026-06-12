@@ -25,18 +25,6 @@
             </button>
         </div>
 
-        @push('scripts')
-            @if (session('success'))
-                <script>
-                    window.addEventListener('load', () => {
-                        window.dispatchEvent(new CustomEvent('toast-success', {
-                            detail: '{{ session('success') }}'
-                        }));
-                    });
-                </script>
-            @endif
-        @endpush
-
         {{-- Pesquisa --}}
         <div class="mb-8">
             <form method="GET" action="{{ route('my-images') }}">

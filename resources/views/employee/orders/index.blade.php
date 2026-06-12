@@ -9,18 +9,6 @@
         <p class="text-[#aaa] text-[0.85rem] m-0">Processa e fecha as encomendas após estampagem e envio.</p>
     </div>
 
-    {{-- Flash --}}
-    @if(session('success'))
-        <div
-            x-data="{ show: true }"
-            x-show="show"
-            x-init="setTimeout(() => show = false, 3000)"
-            class="bg-green-500/10 border border-green-500/20 text-green-400 py-3 px-4 rounded-lg mb-4 text-[0.85rem]"
-        >
-            ✓ {{ session('success') }}
-        </div>
-    @endif
-
     {{-- Empty state --}}
     @if($orders->isEmpty())
         <div class="text-center py-16 px-8 bg-white border border-fs-border rounded-[2px]">

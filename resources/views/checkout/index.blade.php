@@ -23,13 +23,6 @@
                 <form method="POST" action="{{ route('checkout.store') }}">
                     @csrf
 
-                    {{-- Payment error --}}
-                    @if (session('error'))
-                        <div class="bg-red-50 border border-red-200 text-red-400 px-4 py-3 rounded-lg mb-5 text-[0.875rem]">
-                            &#9888; {{ session('error') }}
-                        </div>
-                    @endif
-
                     {{-- Billing info --}}
                     <h3 class="text-fs-dark text-[0.95rem] font-semibold m-0 mb-4 pb-3 border-b border-fs-border">
                         Dados de faturação

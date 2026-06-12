@@ -9,13 +9,6 @@
     deleteId: null
 }">
 
-    {{-- Flash --}}
-    @if(session('success'))
-        <div class="bg-[rgba(34,197,94,0.08)] border border-[rgba(22,163,74,0.25)] text-[#16a34a] px-3 py-[0.75rem] rounded-[1px] mb-4 text-[0.85rem]">
-            {{ session('success') }}
-        </div>
-    @endif
-
     {{-- Toolbar --}}
     <div class="flex justify-end mb-5">
         <button type="button"

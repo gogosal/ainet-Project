@@ -10,18 +10,6 @@
         </a>
     </div>
 
-    {{-- Flash --}}
-    @if (session()->has('success'))
-        <div class="bg-green-50 border border-green-200 text-green-700 px-3 py-3 rounded-[1px] mb-4 text-[0.85rem]">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session()->has('error'))
-        <div class="bg-red-50 border border-red-200 text-red-600 px-3 py-3 rounded-[1px] mb-4 text-[0.85rem]">
-            {{ session('error') }}
-        </div>
-    @endif
-
     {{-- Order Header --}}
     <div class="bg-white border border-fs-border rounded-[2px] p-6 mb-6">
         <div class="flex items-start justify-between flex-wrap gap-4">

@@ -9,32 +9,6 @@
             <p class="mt-2 text-sm text-gray-500">Gere as tuas informações pessoais, moradas e segurança da conta.</p>
         </div>
 
-        {{-- Alerta de Erro --}}
-        @if ($errors->any())
-            @push('scripts')
-                <script>
-                    window.addEventListener('load', () => {
-                        window.dispatchEvent(new CustomEvent('toast-error', {
-                            detail: '{{ $errors->first() }}'
-                        }));
-                    });
-                </script>
-            @endpush
-        @endif
-
-        {{-- Alerta de Sucesso --}}
-        @if (session('success') || session('passwordSuccess'))
-            @push('scripts')
-                <script>
-                    window.addEventListener('load', () => {
-                        window.dispatchEvent(new CustomEvent('toast-success', {
-                            detail: '{{ session('success') ?? session('passwordSuccess') }}'
-                        }));
-                    });
-                </script>
-            @endpush
-        @endif
-
         <div class="space-y-10 sm:space-y-16">
 
             {{-- SECTION 1: Informações Pessoais --}}

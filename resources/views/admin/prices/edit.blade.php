@@ -2,13 +2,6 @@
 
 @section('content')
 
-{{-- Flash --}}
-@if(session('success'))
-    <div class="bg-[rgba(34,197,94,0.08)] border border-[rgba(22,163,74,0.25)] text-[#16a34a] px-3 py-[0.75rem] rounded-[1px] mb-5 text-[0.85rem]">
-        {{ session('success') }}
-    </div>
-@endif
-
 <div class="bg-white border border-fs-border rounded-[2px] p-7">
     <h2 class="text-fs-dark text-base font-bold m-0 mb-6 pb-4 border-b border-fs-border">
         Configuração de preços

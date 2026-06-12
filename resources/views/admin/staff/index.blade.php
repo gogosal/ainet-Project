@@ -27,18 +27,6 @@
          }
      }">
 
-    {{-- Flash --}}
-    @if (session()->has('success'))
-        <div class="bg-green-50 border border-green-200 text-green-700 px-3 py-3 rounded-[1px] mb-4 text-[0.85rem]">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session()->has('error'))
-        <div class="bg-red-50 border border-red-200 text-red-600 px-3 py-3 rounded-[1px] mb-4 text-[0.85rem]">
-            {{ session('error') }}
-        </div>
-    @endif
-
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
         <div>
@@ -53,16 +41,6 @@
         </button>
     </div>
 
-    {{-- Validation errors from redirect --}}
-    @if ($errors->any())
-        <div class="bg-red-50 border border-red-200 rounded-[1px] px-4 py-3 mb-4">
-            <ul class="m-0 pl-4 text-red-500 text-[0.8rem]">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
 
     {{-- Table --}}
     <div class="bg-white border border-fs-border rounded-[2px] overflow-hidden">

@@ -3,13 +3,6 @@
 
 <div class="p-6">
 
-    {{-- Flash --}}
-    @if (session()->has('success'))
-        <div class="bg-green-50 border border-green-200 text-green-700 px-3 py-3 rounded-[1px] mb-4 text-[0.85rem]">
-            {{ session('success') }}
-        </div>
-    @endif
-
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
         <div>
