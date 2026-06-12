@@ -22,9 +22,9 @@ class EnsureUserType
         }
 
         if (!in_array($request->user()->user_type, $types)) {
-            $fallback = match($request->user()->user_type) {
-                'A' => route('admin.dashboard'),
-                'F' => route('employee.orders'),
+            $fallback = match ($request->user()->user_type) {
+                'A' => route('landing'),
+                'F' => route('landing'),
                 default => route('catalog'),
             };
             return redirect($fallback);

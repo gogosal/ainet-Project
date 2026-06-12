@@ -19,7 +19,7 @@ class MyImageRequest extends FormRequest
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'category_id' => 'nullable|exists:categories,id',
-            'image'       => $isCreate ? 'required|image|max:4096' : 'nullable|image|max:4096',
+            'image'       => $isCreate ? 'required|image|max:4096' : 'nullable|mimes:jpeg,png,jpg,webp|image|max:4096',
         ];
     }
 }

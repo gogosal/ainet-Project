@@ -14,6 +14,20 @@ class ColorController extends Controller
     {
         $colors = Color::orderBy('name')->get();
 
+        foreach ($colors as $color) {
+            $baseCode = ltrim($color->code, '#');
+            $color->baseFile = null;
+
+            foreach (['.jpg', '.jpeg', '.png'] as $ext) {
+                if (file_exists(public_path('storage/tshirt_base/' . $baseCode . $ext))) {
+                    $color->baseFile = $baseCode . $ext;
+                    break;
+                }
+            }
+
+            $color->cleanCode = $baseCode;
+        }
+
         return view('admin.colors.index', compact('colors'));
     }
 
@@ -24,7 +38,7 @@ class ColorController extends Controller
         Color::create(['code' => $data['code'], 'name' => $data['name']]);
 
         if ($request->hasFile('image')) {
-            $filename = ltrim($data['code'], '#').'.png';
+            $filename = ltrim($data['code'], '#') . '.png';
             $request->file('image')->storeAs('tshirt_base', $filename, 'public');
         }
 
@@ -38,7 +52,7 @@ class ColorController extends Controller
         $color->update(['name' => $data['name']]);
 
         if ($request->hasFile('image')) {
-            $filename = ltrim($color->code, '#').'.png';
+            $filename = ltrim($color->code, '#') . '.png';
             $request->file('image')->storeAs('tshirt_base', $filename, 'public');
         }
 

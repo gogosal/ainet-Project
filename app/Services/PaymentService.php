@@ -8,7 +8,9 @@ class PaymentService
 {
     public function process(string $type, string $reference, float $value): array
     {
-        $response = Http::post('https://ainet-payments-api.vercel.app/api/payments', [
+        $url = config('services.payments.url');
+
+        $response = Http::post($url, [
             'type' => $type,
             'reference' => $reference,
             'value' => round($value, 2),

@@ -13,12 +13,14 @@ class ColorRequest extends FormRequest
 
     public function rules(): array
     {
+        $isEdit = $this->routeIs('*.update');
+
         $rules = [
             'name'  => 'required|string|max:255',
             'image' => 'nullable|image|max:4096',
         ];
 
-        if ($this->isMethod('POST')) {
+        if (!$isEdit) {
             $rules['code'] = 'required|string|max:20|unique:colors,code';
         }
 

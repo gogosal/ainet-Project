@@ -15,18 +15,7 @@ use App\Http\Controllers\Admin;
 Route::get('/', fn() => view('landing'))->name('landing');
 
 // Serve private tshirt images
-Route::get('/private-image/{filename}', function (string $filename) {
-    $filename = basename($filename);
-    foreach (['tshirt_images_private', 'tshirt_images'] as $dir) {
-        $path = storage_path('app/private/' . $dir . '/' . $filename);
-        if (file_exists($path)) {
-            $mime = str_ends_with($filename, '.jpg') || str_ends_with($filename, '.jpeg') ? 'image/jpeg' : 'image/png';
-
-            return response()->file($path, ['Content-Type' => $mime]);
-        }
-    }
-    abort(404);
-})->name('private-image');
+Route::get('/private-image/{filename}', [MyImagesController::class, 'servePrivateImage'])->name('private-image');
 
 // Fallback
 Route::fallback(fn() => redirect('/'));

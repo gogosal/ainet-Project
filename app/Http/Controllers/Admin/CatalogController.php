@@ -19,12 +19,22 @@ class CatalogController extends Controller
         $categoryFilter = $request->query('category');
 
         $images = TshirtImage::whereNull('customer_id')
-            ->when($search, fn ($q) => $q->where('name', 'like', "%{$search}%"))
-            ->when($categoryFilter, fn ($q) => $q->where('category_id', $categoryFilter))
+            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->when($categoryFilter, fn($q) => $q->where('category_id', $categoryFilter))
             ->with('category')
             ->latest()
             ->paginate(12)
             ->appends($request->query());
+
+        foreach ($images as $img) {
+            if ($img->image_url) {
+                $img->catalogUrl = str_contains($img->image_url, '/')
+                    ? Storage::url($img->image_url)
+                    : asset('storage/tshirt_images/' . $img->image_url);
+            } else {
+                $img->catalogUrl = null;
+            }
+        }
 
         $categories = Category::orderBy('name')->get();
 

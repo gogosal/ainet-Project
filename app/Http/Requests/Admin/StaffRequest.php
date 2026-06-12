@@ -15,12 +15,14 @@ class StaffRequest extends FormRequest
     {
         $userId = $this->route('user')?->id;
 
+        $isEdit = $userId !== null;
+
         return [
             'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:users,email'.($userId ? ','.$userId : ''),
+            'email'     => 'required|email|unique:users,email' . ($userId ? ',' . $userId : ''),
             'user_type' => 'required|in:F,A',
             'gender'    => 'nullable|in:M,F',
-            'password'  => $this->isMethod('POST') ? 'required|min:8|confirmed' : 'nullable|min:8|confirmed',
+            'password'  => $isEdit ? 'nullable|min:8' : 'required|min:8',
         ];
     }
 }

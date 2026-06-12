@@ -13,9 +13,11 @@ class CategoryRequest extends FormRequest
 
     public function rules(): array
     {
+        $isEdit = $this->route('category') !== null;
+
         return [
             'name'  => 'required|string|max:255',
-            'image' => $this->isMethod('POST') ? 'required|image|max:2048' : 'nullable|image|max:2048',
+            'image' => $isEdit ? 'nullable|image|max:2048' : 'required|image|max:2048',
         ];
     }
 }

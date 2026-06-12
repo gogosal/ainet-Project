@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MyImagesController extends Controller
 {
@@ -86,18 +87,22 @@ class MyImagesController extends Controller
         return back()->with('success', 'Imagem eliminada.');
     }
 
-    public function rules(): array
+    public function servePrivateImage(string $filename): BinaryFileResponse
     {
-        return [
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
-            'image'       => [
-                $this->isMethod('put') ? 'nullable' : 'required',
-                'image',
-                'mimes:jpeg,png,jpg,webp',
-                'max:2048'
-            ],
-        ];
+        // Proteção básica para evitar navegação de diretórios (Directory Traversal)
+        $filename = basename($filename);
+
+        foreach (['tshirt_images_private', 'tshirt_images'] as $dir) {
+            $path = storage_path('app/private/' . $dir . '/' . $filename);
+
+            if (file_exists($path)) {
+                // Adicionei strtolower para garantir que apanha extensões como .JPG
+                $isJpeg = str_ends_with(strtolower($filename), '.jpg') || str_ends_with(strtolower($filename), '.jpeg');
+                $mime = $isJpeg ? 'image/jpeg' : 'image/png';
+
+                return response()->file($path, ['Content-Type' => $mime]);
+            }
+        }
+        abort(404);
     }
 }

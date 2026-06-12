@@ -18,11 +18,11 @@ class OrderController extends Controller
         $statusFilter = $request->query('status', 'all');
 
         $orders = Order::with('customer.user')
-            ->when($search, fn ($q) => $q->where(function ($q) use ($search) {
+            ->when($search, fn($q) => $q->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhereHas('customer.user', fn ($q) => $q->where('name', 'like', "%{$search}%"));
+                    ->orWhereHas('customer.user', fn($q) => $q->where('name', 'like', "%{$search}%"));
             }))
-            ->when($statusFilter !== 'all', fn ($q) => $q->where('status', $statusFilter))
+            ->when($statusFilter !== 'all', fn($q) => $q->where('status', $statusFilter))
             ->latest()
             ->paginate(20)
             ->appends($request->query());
@@ -62,6 +62,7 @@ class OrderController extends Controller
         try {
             \Mail::to($order->customer->user->email)->send(new \App\Mail\OrderCanceledMail($order));
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erro ao enviar email de cancelamento: ' . $e->getMessage());
         }
 
         return back()->with('success', "Encomenda #{$order->id} cancelada.");
@@ -73,7 +74,7 @@ class OrderController extends Controller
             abort(404);
         }
 
-        $path = storage_path('app/private/'.$order->receipt_url);
+        $path = storage_path('app/private/' . $order->receipt_url);
         if (! file_exists($path)) {
             abort(404);
         }

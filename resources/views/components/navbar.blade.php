@@ -4,7 +4,7 @@
     <div class="max-w-[1280px] mx-auto px-8 h-14 flex items-center gap-8">
 
         {{-- Logo --}}
-        <a href="{{ route('home') }}"
+        <a href="{{ route('landing') }}"
             class="text-xs font-bold tracking-[.22em] uppercase text-[#1a1a1a] no-underline shrink-0">
             Funshirt
         </a>

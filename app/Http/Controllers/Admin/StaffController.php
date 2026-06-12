@@ -15,20 +15,41 @@ class StaffController extends Controller
     {
         $staff = User::whereIn('user_type', ['F', 'A'])->orderBy('name')->get();
 
-        return view('admin.staff.index', compact('staff'));
+        $roles = [
+            'A' => 'Administrador',
+            'F' => 'Funcionário',
+        ];
+
+        foreach ($staff as $member) {
+            if ($member->photo_url) {
+                $member->photoSrc = str_contains($member->photo_url, '/')
+                    ? asset('storage/' . $member->photo_url)
+                    : asset('storage/photos/' . $member->photo_url);
+            } else {
+                $member->photoSrc = null;
+            }
+        }
+
+        return view('admin.staff.index', compact('staff', 'roles'));
     }
 
     public function store(StaffRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
-        User::create([
+        $userData = [
             'name'      => $data['name'],
             'email'     => $data['email'],
             'password'  => Hash::make($data['password']),
             'user_type' => $data['user_type'],
             'gender'    => $data['gender'] ?? null,
-        ]);
+        ];
+
+        if ($request->hasFile('photo')) {
+            $userData['photo_url'] = $request->file('photo')->store('photos', 'public');
+        }
+
+        User::create($userData);
 
         return back()->with('success', 'Colaborador criado.');
     }
@@ -44,8 +65,12 @@ class StaffController extends Controller
             'gender'    => $data['gender'] ?? null,
         ];
 
-        if (! empty($data['password'])) {
+        if (!empty($data['password'])) {
             $updateData['password'] = Hash::make($data['password']);
+        }
+
+        if ($request->hasFile('photo')) {
+            $updateData['photo_url'] = $request->file('photo')->store('photos', 'public');
         }
 
         $user->update($updateData);
