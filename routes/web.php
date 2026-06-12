@@ -1,120 +1,115 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Catalog\CatalogPage;
-use App\Livewire\Cart\CartPage;
-use App\Livewire\Checkout\CheckoutPage;
-use App\Livewire\Orders\OrdersPage;
-use App\Livewire\Orders\OrderDetailPage;
-use App\Livewire\Profile\ProfilePage;
-use App\Livewire\MyImages\MyImagesPage;
-use App\Livewire\Employee\EmployeeOrdersPage;
-use App\Livewire\Admin\AdminDashboard;
-use App\Livewire\Admin\AdminCatalogPage;
-use App\Livewire\Admin\AdminCategoriesPage;
-use App\Livewire\Admin\AdminColorsPage;
-use App\Livewire\Admin\AdminPricesPage;
-use App\Livewire\Admin\AdminOrdersPage;
-use App\Livewire\Admin\AdminOrderDetailPage;
-use App\Livewire\Admin\AdminCustomersPage;
-use App\Livewire\Admin\AdminStaffPage;
-use App\Livewire\Admin\AdminStatisticsPage;
-use App\Livewire\VirtualTryOn\VirtualTryOnPage;
+use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\TryOnController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\MyImagesController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Employee;
+use App\Http\Controllers\Admin;
 
 // Home landing page
-Route::get('/', fn() => view('landing'))->name('home');
+Route::get('/', fn () => view('landing'))->name('home');
 
-// Serve private tshirt images (custom uploads)
+// Serve private tshirt images
 Route::get('/private-image/{filename}', function (string $filename) {
-    $filename = basename($filename); // prevent path traversal
+    $filename = basename($filename);
     foreach (['tshirt_images_private', 'tshirt_images'] as $dir) {
-        $path = storage_path('app/private/' . $dir . '/' . $filename);
+        $path = storage_path('app/private/'.$dir.'/'.$filename);
         if (file_exists($path)) {
             $mime = str_ends_with($filename, '.jpg') || str_ends_with($filename, '.jpeg') ? 'image/jpeg' : 'image/png';
+
             return response()->file($path, ['Content-Type' => $mime]);
         }
     }
     abort(404);
 })->name('private-image');
 
-// Fallback route for undefined paths
-Route::fallback(function () {
-    return redirect('/');
-});
+// Fallback
+Route::fallback(fn () => redirect('/'));
 
 // Public routes
-Route::get('/catalog', CatalogPage::class)->name('catalog');
-Route::get('/cart', CartPage::class)->name('cart');
-Route::get('/try-on', VirtualTryOnPage::class)->name('try-on');
+Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog');
+Route::get('/try-on', [TryOnController::class, 'index'])->name('try-on');
 
-require __DIR__ . '/settings.php';
+// Cart — accessible without auth
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::post('/cart', [CatalogController::class, 'addToCart'])->name('cart.store');
+Route::post('/try-on/cart', [TryOnController::class, 'addToCart'])->name('try-on.cart');
+Route::patch('/cart/{index}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{index}', [CartController::class, 'destroy'])->name('cart.destroy');
+Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
-// ==========================================
-// Rotas Partilhadas (Acessíveis por C, F e A)
-// ==========================================
+require __DIR__.'/settings.php';
+
+// Authenticated + verified
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/my-images', MyImagesPage::class)->name('my-images');
-    Route::get('/profile', ProfilePage::class)->name('profile');
+    Route::get('/my-images', [MyImagesController::class, 'index'])->name('my-images');
+    Route::post('/my-images', [MyImagesController::class, 'store'])->name('my-images.store');
+    Route::post('/my-images/{image}', [MyImagesController::class, 'update'])->name('my-images.update');
+    Route::delete('/my-images/{image}', [MyImagesController::class, 'destroy'])->name('my-images.destroy');
 
-    // Movido para aqui: Todos acedem
-    Route::get('/orders', OrdersPage::class)->name('orders.index');
-    Route::get('/orders/{order}', OrderDetailPage::class)->name('orders.show');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
 
-    // Receipt access adaptado para não dar erro aos Admins/Funcionários
-    Route::get('/orders/{order}/receipt', function (\App\Models\Order $order) {
-        $user = auth()->user();
-
-        // Se for cliente (C), só pode ver se a encomenda for dele
-        if ($user->type === 'C') {
-            if (!$user->customer || $order->customer_id !== $user->customer->id) {
-                abort(403);
-            }
-        }
-
-        if (!$order->receipt_url) abort(404);
-        $path = storage_path('app/private/' . $order->receipt_url);
-        if (!file_exists($path)) abort(404);
-
-        return response()->file($path, ['Content-Type' => 'application/pdf']);
-    })->name('orders.receipt');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
 });
 
-// ==========================================
-// Rotas Exclusivas de Cliente (C)
-// ==========================================
+// Client only
 Route::middleware(['auth', 'verified', 'user.type:C'])->group(function () {
-    Route::get('/checkout', CheckoutPage::class)->name('checkout');
-    // (As rotas das encomendas saíram daqui e foram para cima)
+    Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 });
 
-// ==========================================
-// Rotas Exclusivas de Funcionário (F)
-// ==========================================
+// Employee
 Route::middleware(['auth', 'user.type:F'])->group(function () {
-    Route::get('/employee/orders', EmployeeOrdersPage::class)->name('employee.orders');
+    Route::get('/employee/orders', [Employee\OrderController::class, 'index'])->name('employee.orders');
+    Route::post('/employee/orders/{order}/close', [Employee\OrderController::class, 'close'])->name('employee.orders.close');
 });
 
-// ==========================================
-// Rotas Exclusivas de Admin (A)
-// ==========================================
+// Admin
 Route::middleware(['auth', 'user.type:A'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', fn() => redirect()->route('admin.dashboard'));
-    Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
-    Route::get('/catalog', AdminCatalogPage::class)->name('catalog');
-    Route::get('/categories', AdminCategoriesPage::class)->name('categories');
-    Route::get('/colors', AdminColorsPage::class)->name('colors');
-    Route::get('/prices', AdminPricesPage::class)->name('prices');
-    Route::get('/orders', AdminOrdersPage::class)->name('orders');
-    Route::get('/orders/{order}', AdminOrderDetailPage::class)->name('orders.show');
-    Route::get('/customers', AdminCustomersPage::class)->name('customers');
-    Route::get('/staff', AdminStaffPage::class)->name('staff');
-    Route::get('/statistics', AdminStatisticsPage::class)->name('statistics');
+    Route::get('/', fn () => redirect()->route('admin.dashboard'));
+    Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
-    // Admin receipt access
-    Route::get('/orders/{order}/receipt', function (\App\Models\Order $order) {
-        if (!$order->receipt_url) abort(404);
-        $path = storage_path('app/private/' . $order->receipt_url);
-        if (!file_exists($path)) abort(404);
-        return response()->file($path, ['Content-Type' => 'application/pdf']);
-    })->name('orders.receipt');
+    Route::get('/catalog', [Admin\CatalogController::class, 'index'])->name('catalog');
+    Route::post('/catalog', [Admin\CatalogController::class, 'store'])->name('catalog.store');
+    Route::post('/catalog/{image}', [Admin\CatalogController::class, 'update'])->name('catalog.update');
+    Route::delete('/catalog/{image}', [Admin\CatalogController::class, 'destroy'])->name('catalog.destroy');
+
+    Route::get('/categories', [Admin\CategoryController::class, 'index'])->name('categories');
+    Route::post('/categories', [Admin\CategoryController::class, 'store'])->name('categories.store');
+    Route::post('/categories/{category}', [Admin\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [Admin\CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    Route::get('/colors', [Admin\ColorController::class, 'index'])->name('colors');
+    Route::post('/colors', [Admin\ColorController::class, 'store'])->name('colors.store');
+    Route::post('/colors/{color}', [Admin\ColorController::class, 'update'])->name('colors.update');
+    Route::delete('/colors/{color}', [Admin\ColorController::class, 'destroy'])->name('colors.destroy');
+
+    Route::get('/prices', [Admin\PriceController::class, 'edit'])->name('prices');
+    Route::post('/prices', [Admin\PriceController::class, 'update'])->name('prices.update');
+
+    Route::get('/orders', [Admin\OrderController::class, 'index'])->name('orders');
+    Route::get('/orders/{order}', [Admin\OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/close', [Admin\OrderController::class, 'close'])->name('orders.close');
+    Route::post('/orders/{order}/cancel', [Admin\OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('/orders/{order}/receipt', [Admin\OrderController::class, 'receipt'])->name('orders.receipt');
+
+    Route::get('/customers', [Admin\CustomerController::class, 'index'])->name('customers');
+    Route::post('/customers/{user}/toggle-block', [Admin\CustomerController::class, 'toggleBlock'])->name('customers.toggle-block');
+    Route::delete('/customers/{user}', [Admin\CustomerController::class, 'destroy'])->name('customers.destroy');
+
+    Route::get('/staff', [Admin\StaffController::class, 'index'])->name('staff');
+    Route::post('/staff', [Admin\StaffController::class, 'store'])->name('staff.store');
+    Route::post('/staff/{user}', [Admin\StaffController::class, 'update'])->name('staff.update');
+    Route::delete('/staff/{user}', [Admin\StaffController::class, 'destroy'])->name('staff.destroy');
+
+    Route::get('/statistics', [Admin\StatisticsController::class, 'index'])->name('statistics');
 });

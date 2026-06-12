@@ -13,7 +13,7 @@
 
 {{-- ══ HERO ══ --}}
 <section style="margin: -2.5rem -2rem 0; border-bottom: 1px solid #e0ddd8;">
-    <div style="max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; min-height: 82vh; align-items: stretch;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 56px); align-items: stretch;">
 
         {{-- LEFT: Text --}}
         <div style="display: flex; flex-direction: column; justify-content: center; padding: 5rem 4rem 5rem 0; border-right: 1px solid #e0ddd8;">
