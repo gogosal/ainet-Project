@@ -13,11 +13,12 @@ class OrderController extends Controller
         $statusFilter = $request->query('status', '');
 
         $orders = Order::where('customer_id', auth()->user()->customer->id)
-            ->when($statusFilter, fn ($q) => $q->where('status', $statusFilter))
+            ->when($statusFilter, fn($q) => $q->where('status', $statusFilter))
             ->with('items.tshirtImage')
             ->orderByDesc('created_at')
             ->paginate(10)
-            ->appends($request->query());
+            ->appends($request->query())
+            ->withQueryString();
 
         return view('orders.index', compact('orders', 'statusFilter'));
     }
@@ -47,7 +48,7 @@ class OrderController extends Controller
             abort(404);
         }
 
-        $path = storage_path('app/private/'.$order->receipt_url);
+        $path = storage_path('app/private/' . $order->receipt_url);
         if (! file_exists($path)) {
             abort(404);
         }

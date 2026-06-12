@@ -11,7 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class TryOnController extends Controller
+class View3dController extends Controller
 {
     public function index(Request $request): View
     {
@@ -42,9 +42,15 @@ class TryOnController extends Controller
             ? TshirtImage::whereNull('customer_id')->find($selectedImageId)
             : null;
 
-        return view('try-on.index', compact(
-            'designs', 'colors', 'prices', 'selectedImage',
-            'selectedImageId', 'selectedColor', 'selectedSize', 'selectedSide'
+        return view('view3d.index', compact(
+            'designs',
+            'colors',
+            'prices',
+            'selectedImage',
+            'selectedImageId',
+            'selectedColor',
+            'selectedSize',
+            'selectedSide'
         ));
     }
 

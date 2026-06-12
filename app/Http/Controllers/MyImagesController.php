@@ -19,7 +19,7 @@ class MyImagesController extends Controller
         $customerId = Auth::user()->customer?->id;
 
         $images = TshirtImage::where('customer_id', $customerId ?? 0)
-            ->when($search, fn ($q) => $q->where('name', 'like', "%{$search}%"))
+            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%"))
             ->with('category')
             ->latest()
             ->paginate(12)
@@ -84,5 +84,20 @@ class MyImagesController extends Controller
         $image->delete();
 
         return back()->with('success', 'Imagem eliminada.');
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
+            'image'       => [
+                $this->isMethod('put') ? 'nullable' : 'required',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048'
+            ],
+        ];
     }
 }

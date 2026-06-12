@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CatalogController;
-use App\Http\Controllers\TryOnController;
+use App\Http\Controllers\View3dController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
@@ -12,13 +12,13 @@ use App\Http\Controllers\Employee;
 use App\Http\Controllers\Admin;
 
 // Home landing page
-Route::get('/', fn () => view('landing'))->name('home');
+Route::get('/', fn() => view('landing'))->name('home');
 
 // Serve private tshirt images
 Route::get('/private-image/{filename}', function (string $filename) {
     $filename = basename($filename);
     foreach (['tshirt_images_private', 'tshirt_images'] as $dir) {
-        $path = storage_path('app/private/'.$dir.'/'.$filename);
+        $path = storage_path('app/private/' . $dir . '/' . $filename);
         if (file_exists($path)) {
             $mime = str_ends_with($filename, '.jpg') || str_ends_with($filename, '.jpeg') ? 'image/jpeg' : 'image/png';
 
@@ -29,27 +29,31 @@ Route::get('/private-image/{filename}', function (string $filename) {
 })->name('private-image');
 
 // Fallback
-Route::fallback(fn () => redirect('/'));
+Route::fallback(fn() => redirect('/'));
 
 // Public routes
+Route::get('/login', fn() => view('auth.login'))->name('login');
+Route::get('/register', fn() => view('auth.register'))->name('register');
+Route::get('/forgot-password', fn() => view('auth.forgot-password'))->name('password.request');
+Route::get('/email/verify', fn() => view('auth.verify-email'))->middleware('auth')->name('verification.notice');
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog');
-Route::get('/try-on', [TryOnController::class, 'index'])->name('try-on');
+Route::get('/view3d', [View3dController::class, 'index'])->name('view3d');
 
 // Cart — accessible without auth
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::post('/cart', [CatalogController::class, 'addToCart'])->name('cart.store');
-Route::post('/try-on/cart', [TryOnController::class, 'addToCart'])->name('try-on.cart');
+Route::post('/view3d/cart', [View3dController::class, 'addToCart'])->name('view3d.cart');
 Route::patch('/cart/{index}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{index}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
 
 // Authenticated + verified
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/my-images', [MyImagesController::class, 'index'])->name('my-images');
     Route::post('/my-images', [MyImagesController::class, 'store'])->name('my-images.store');
-    Route::post('/my-images/{image}', [MyImagesController::class, 'update'])->name('my-images.update');
+    Route::put('/my-images/{image}', [MyImagesController::class, 'update'])->name('my-images.update');
     Route::delete('/my-images/{image}', [MyImagesController::class, 'destroy'])->name('my-images.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
@@ -75,7 +79,7 @@ Route::middleware(['auth', 'user.type:F'])->group(function () {
 
 // Admin
 Route::middleware(['auth', 'user.type:A'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', fn () => redirect()->route('admin.dashboard'));
+    Route::get('/', fn() => redirect()->route('admin.dashboard'));
     Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/catalog', [Admin\CatalogController::class, 'index'])->name('catalog');

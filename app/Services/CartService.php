@@ -18,38 +18,60 @@ class CartService
         return array_sum(array_column($this->items(), 'qty'));
     }
 
-    public function add(int $imageId, string $colorCode, string $size, int $qty, string $side = 'front'): void
+    public function add(int $imageId, string $colorCode, string $size, int $qty): void
     {
         $cart = $this->items();
+
         foreach ($cart as &$item) {
-            if ($item['tshirt_image_id'] === $imageId && $item['color_code'] === $colorCode && $item['size'] === $size && ($item['side'] ?? 'front') === $side) {
+            if ($item['tshirt_image_id'] === $imageId && $item['color_code'] === $colorCode && $item['size'] === $size) {
                 $item['qty'] += $qty;
                 session(['cart' => $cart]);
                 return;
             }
         }
+
         $cart[] = [
             'tshirt_image_id' => $imageId,
             'color_code'      => $colorCode,
             'size'            => $size,
             'qty'             => $qty,
-            'side'            => $side,
         ];
+
         session(['cart' => $cart]);
     }
 
     public function update(int $index, string $colorCode, string $size, int $qty): void
     {
         $cart = $this->items();
+
         if (!isset($cart[$index])) return;
+
         if ($qty <= 0) {
             $this->remove($index);
             return;
         }
+
+        foreach ($cart as $i => &$item) {
+            if (
+                $i != $index &&
+                $item['tshirt_image_id'] === $cart[$index]['tshirt_image_id'] &&
+                $item['color_code'] === $colorCode &&
+                $item['size'] === $size
+            ) {
+
+                $item['qty'] += $qty;
+                unset($cart[$index]);
+
+                session(['cart' => array_values($cart)]);
+                return;
+            }
+        }
+
         $cart[$index]['color_code'] = $colorCode;
         $cart[$index]['size'] = $size;
         $cart[$index]['qty'] = $qty;
-        session(['cart' => $cart]);
+
+        session(['cart' => array_values($cart)]);
     }
 
     public function remove(int $index): void
@@ -80,18 +102,19 @@ class CartService
             $color = $colors[$item['color_code']] ?? null;
             $isOwn = $image && !is_null($image->customer_id);
             $unitPrice = $prices->priceForItem($isOwn, $item['qty']);
+
             $enriched[] = [
-                'index' => $index,
+                'index'           => $index,
                 'tshirt_image_id' => $item['tshirt_image_id'],
-                'color_code' => $item['color_code'],
-                'size' => $item['size'],
-                'qty' => $item['qty'],
-                'image' => $image,
-                'color' => $color,
-                'unit_price' => $unitPrice,
-                'sub_total' => round($unitPrice * $item['qty'], 2),
-                'is_own' => $isOwn,
-                'has_discount' => $item['qty'] >= $prices->qty_discount,
+                'color_code'      => $item['color_code'],
+                'size'            => $item['size'],
+                'qty'             => $item['qty'],
+                'image'           => $image,
+                'color'           => $color,
+                'unit_price'      => $unitPrice,
+                'sub_total'       => round($unitPrice * $item['qty'], 2),
+                'is_own'          => $isOwn,
+                'has_discount'    => $item['qty'] >= $prices->qty_discount,
             ];
         }
         return $enriched;

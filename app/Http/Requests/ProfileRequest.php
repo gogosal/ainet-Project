@@ -15,9 +15,9 @@ class ProfileRequest extends FormRequest
     {
         return [
             'name'                 => 'required|string|max:255',
-            'email'                => 'required|email|unique:users,email,'.auth()->id(),
+            'email'                => 'required|email|unique:users,email,' . auth()->id(),
             'gender'               => 'nullable|in:M,F',
-            'nif'                  => 'nullable|digits:9',
+            'nif'                  => 'nullable|numeric|digits:9',
             'address'              => 'nullable|string|max:500',
             'default_payment_type' => 'nullable|in:Visa,PayPal,MB WAY',
             'default_payment_ref'  => 'nullable|string|max:255',
