@@ -8,10 +8,6 @@
 
     <p style="color:#888;font-size:.84rem;line-height:1.55;margin-bottom:1.5rem;">Insere o teu e-mail e enviamos um link para definires uma nova password.</p>
 
-    @if (session('status'))
-        <div class="auth-status-ok">{{ session('status') }}</div>
-    @endif
-
     <form method="POST" action="{{ route('password.email') }}" style="display:flex;flex-direction:column;gap:1.25rem;">
         @csrf
         <div>

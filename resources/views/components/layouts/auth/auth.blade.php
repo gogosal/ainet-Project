@@ -202,6 +202,22 @@
         <a href="{{ route('catalog') }}" style="color:#c8c4be;text-decoration:none;">Catálogo</a>
     </div>
 
+    {{-- Toast --}}
+    <div x-data="{
+        message: '{{ session('status') ?? session('success') ?? session('error') ?? ($errors->any() ? $errors->first() : '') }}',
+        show: {{ session()->has('status') || session()->has('success') || session()->has('error') || $errors->any() ? 'true' : 'false' }},
+        type: '{{ session()->has('status') || session()->has('success') ? 'success' : 'error' }}'
+    }" x-init="if (show) setTimeout(() => show = false, 5000)" class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2">
+        <div x-show="show" x-cloak x-transition:enter="transition ease-out duration-300"
+            x-transition:leave="transition ease-in duration-200"
+            :class="type === 'success' ? 'border-green-500' : 'border-red-500'"
+            class="bg-white border-l-4 shadow-lg rounded-lg p-4 flex items-center gap-3">
+            <span x-text="type === 'success' ? '✓' : '⚠'"
+                :class="type === 'success' ? 'text-green-500' : 'text-red-500'" class="font-bold"></span>
+            <p class="text-sm font-medium text-gray-800 m-0" x-text="message"></p>
+        </div>
+    </div>
+
     @fluxScripts
     @livewireScripts
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
