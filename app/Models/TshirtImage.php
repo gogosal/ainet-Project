@@ -21,5 +21,17 @@ class TshirtImage extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    public function isCatalog(): bool { return is_null($this->customer_id); }
+    public function isCatalog(): bool
+    {
+        return is_null($this->customer_id);
+    }
+
+    public function getFullImageUrlAttribute(): string
+    {
+        if ($this->isCatalog()) {
+            return asset('storage/tshirt_images/' . $this->image_url);
+        } else {
+            return route('private-image', ['filename' => $this->image_url]);
+        }
+    }
 }

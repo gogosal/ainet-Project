@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
@@ -18,8 +19,14 @@ class AdminOrdersPage extends Component
     public ?int $cancelOrderId = null;
     public string $cancelReason = '';
 
-    public function updatedSearch(): void { $this->resetPage(); }
-    public function updatedStatusFilter(): void { $this->resetPage(); }
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+    public function updatedStatusFilter(): void
+    {
+        $this->resetPage();
+    }
 
     public function closeOrder(int $orderId): void
     {
@@ -48,7 +55,8 @@ class AdminOrdersPage extends Component
         // Send cancellation email
         try {
             \Mail::to($order->customer->user->email)->send(new \App\Mail\OrderCanceledMail($order));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         $this->showCancelModal = false;
         $this->cancelOrderId = null;
         session()->flash('success', "Encomenda #{$order->id} cancelada.");
@@ -57,9 +65,9 @@ class AdminOrdersPage extends Component
     public function render()
     {
         $orders = Order::with('customer.user')
-            ->when($this->search, fn($q) => $q->where(function($q) {
+            ->when($this->search, fn($q) => $q->where(function ($q) {
                 $q->where('id', 'like', "%{$this->search}%")
-                  ->orWhereHas('customer.user', fn($q) => $q->where('name', 'like', "%{$this->search}%"));
+                    ->orWhereHas('customer.user', fn($q) => $q->where('name', 'like', "%{$this->search}%"));
             }))
             ->when($this->statusFilter !== 'all', fn($q) => $q->where('status', $this->statusFilter))
             ->latest()
@@ -68,4 +76,5 @@ class AdminOrdersPage extends Component
         return view('livewire.admin.admin-orders-page', compact('orders'))
             ->layout('layouts.admin', ['title' => 'Encomendas']);
     }
+
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
@@ -19,22 +20,29 @@ class AdminColorsPage extends Component
 
     public function openCreate(): void
     {
-        $this->editingCode = null; $this->modalCode = $this->modalName = ''; $this->modalImage = null;
-        $this->resetValidation(); $this->showModal = true;
+        $this->editingCode = null;
+        $this->modalCode = $this->modalName = '';
+        $this->modalImage = null;
+        $this->resetValidation();
+        $this->showModal = true;
     }
 
     public function openEdit(string $code): void
     {
         $color = Color::findOrFail($code);
-        $this->editingCode = $code; $this->modalCode = $color->code; $this->modalName = $color->name; $this->modalImage = null;
-        $this->resetValidation(); $this->showModal = true;
+        $this->editingCode = $code;
+        $this->modalCode = $color->code;
+        $this->modalName = $color->name;
+        $this->modalImage = null;
+        $this->resetValidation();
+        $this->showModal = true;
     }
 
     public function save(): void
     {
         $rules = [
             'modalName' => 'required|string|max:255',
-            'modalImage' => 'nullable|image|max:4096',
+            'modalImage' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
         ];
         if (!$this->editingCode) {
             $rules['modalCode'] = 'required|string|max:20|unique:colors,code';
@@ -60,8 +68,14 @@ class AdminColorsPage extends Component
         session()->flash('success', $this->editingCode ? 'Cor atualizada.' : 'Cor criada.');
     }
 
-    public function confirmDelete(string $code): void { $this->deleteCode = $code; }
-    public function cancelDelete(): void { $this->deleteCode = null; }
+    public function confirmDelete(string $code): void
+    {
+        $this->deleteCode = $code;
+    }
+    public function cancelDelete(): void
+    {
+        $this->deleteCode = null;
+    }
     public function deleteColor(): void
     {
         Color::findOrFail($this->deleteCode)->delete();

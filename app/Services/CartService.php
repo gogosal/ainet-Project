@@ -41,10 +41,22 @@ class CartService
     public function update(int $index, string $colorCode, string $size, int $qty): void
     {
         $cart = $this->items();
+
         if (!isset($cart[$index])) return;
+
+
         if ($qty <= 0) {
             $this->remove($index);
             return;
+        }
+
+        foreach ($cart as $i => &$item) {
+            if ($i != $index && $item['tshirt_image_id'] === $cart[$index]['tshirt_image_id'] && $item['color_code'] === $colorCode && $item['size'] === $size) {
+                $item['qty'] += $qty;
+                unset($cart[$index]);
+                session(['cart' => $cart]);
+                return;
+            }
         }
         $cart[$index]['color_code'] = $colorCode;
         $cart[$index]['size'] = $size;

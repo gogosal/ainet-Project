@@ -53,9 +53,6 @@ require __DIR__ . '/settings.php';
 // Rotas Partilhadas (Acessíveis por C, F e A)
 // ==========================================
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/my-images', MyImagesPage::class)->name('my-images');
-    Route::get('/profile', ProfilePage::class)->name('profile');
-
     // Movido para aqui: Todos acedem
     Route::get('/orders', OrdersPage::class)->name('orders.index');
     Route::get('/orders/{order}', OrderDetailPage::class)->name('orders.show');
@@ -77,44 +74,47 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         return response()->file($path, ['Content-Type' => 'application/pdf']);
     })->name('orders.receipt');
-});
 
-// ==========================================
-// Rotas Exclusivas de Cliente (C)
-// ==========================================
-Route::middleware(['auth', 'verified', 'user.type:C'])->group(function () {
-    Route::get('/checkout', CheckoutPage::class)->name('checkout');
-    // (As rotas das encomendas saíram daqui e foram para cima)
-});
 
-// ==========================================
-// Rotas Exclusivas de Funcionário (F)
-// ==========================================
-Route::middleware(['auth', 'user.type:F'])->group(function () {
-    Route::get('/employee/orders', EmployeeOrdersPage::class)->name('employee.orders');
-});
+    // ==========================================
+    // Rotas Exclusivas de Cliente (C)
+    // ==========================================
+    Route::middleware(['user.type:C'])->group(function () {
+        Route::get('/checkout', CheckoutPage::class)->name('checkout');
+        Route::get('/profile', ProfilePage::class)->name('profile');
+        Route::get('/my-images', MyImagesPage::class)->name('my-images');
+    });
 
-// ==========================================
-// Rotas Exclusivas de Admin (A)
-// ==========================================
-Route::middleware(['auth', 'user.type:A'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', fn() => redirect()->route('admin.dashboard'));
-    Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
-    Route::get('/catalog', AdminCatalogPage::class)->name('catalog');
-    Route::get('/categories', AdminCategoriesPage::class)->name('categories');
-    Route::get('/colors', AdminColorsPage::class)->name('colors');
-    Route::get('/prices', AdminPricesPage::class)->name('prices');
-    Route::get('/orders', AdminOrdersPage::class)->name('orders');
-    Route::get('/orders/{order}', AdminOrderDetailPage::class)->name('orders.show');
-    Route::get('/customers', AdminCustomersPage::class)->name('customers');
-    Route::get('/staff', AdminStaffPage::class)->name('staff');
-    Route::get('/statistics', AdminStatisticsPage::class)->name('statistics');
+    // ==========================================
+    // Rotas Exclusivas de Funcionário (F)
+    // ==========================================
+    Route::middleware(['user.type:F'])->group(function () {
+        Route::get('/employee/orders', EmployeeOrdersPage::class)->name('employee.orders');
+    });
 
-    // Admin receipt access
-    Route::get('/orders/{order}/receipt', function (\App\Models\Order $order) {
-        if (!$order->receipt_url) abort(404);
-        $path = storage_path('app/private/' . $order->receipt_url);
-        if (!file_exists($path)) abort(404);
-        return response()->file($path, ['Content-Type' => 'application/pdf']);
-    })->name('orders.receipt');
+    // ==========================================
+    // Rotas Exclusivas de Admin (A)
+    // ==========================================
+    Route::middleware(['user.type:A'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', fn() => redirect()->route('admin.dashboard'));
+        Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
+        Route::get('/catalog', AdminCatalogPage::class)->name('catalog');
+        Route::get('/categories', AdminCategoriesPage::class)->name('categories');
+        Route::get('/colors', AdminColorsPage::class)->name('colors');
+        Route::get('/prices', AdminPricesPage::class)->name('prices');
+        Route::get('/orders', AdminOrdersPage::class)->name('orders');
+        Route::get('/orders/{order}', AdminOrderDetailPage::class)->name('orders.show');
+        Route::get('/customers', AdminCustomersPage::class)->name('customers');
+        Route::get('/staff', AdminStaffPage::class)->name('staff');
+        Route::get('/statistics', AdminStatisticsPage::class)->name('statistics');
+        Route::get('/profile', ProfilePage::class)->name('profile');
+
+        // Admin receipt access
+        Route::get('/orders/{order}/receipt', function (\App\Models\Order $order) {
+            if (!$order->receipt_url) abort(404);
+            $path = storage_path('app/private/' . $order->receipt_url);
+            if (!file_exists($path)) abort(404);
+            return response()->file($path, ['Content-Type' => 'application/pdf']);
+        })->name('orders.receipt');
+    });
 });

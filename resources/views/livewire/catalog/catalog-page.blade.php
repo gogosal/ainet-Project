@@ -151,7 +151,7 @@
                         <div
                             class="bg-white border border-[#e0ddd8] rounded-[2px] overflow-hidden transition-colors duration-150 hover:border-[#7c6fa0]">
 
-                            @php
+                            {{-- @php
                                 $bare = basename($image->image_url);
                                 if (\Illuminate\Support\Str::startsWith($image->image_url, 'tshirt_images_private/')) {
                                     $thumbDesignUrl = route('private-image', $bare);
@@ -160,11 +160,11 @@
                                 } else {
                                     $thumbDesignUrl = asset('storage/tshirt_images/' . $bare);
                                 }
-                            @endphp
+                            @endphp --}}
 
                             <div
                                 class="bg-[#eeecea] h-[180px] flex items-center justify-center border-b border-[#e0ddd8] overflow-hidden p-4">
-                                <img src="{{ $thumbDesignUrl }}" alt="{{ $image->name }}"
+                                <img src="{{ $image->full_image_url }}" alt="{{ $image->name }}"
                                     class="max-w-full max-h-full object-contain block"
                                     onerror="this.style.opacity='.15'">
                             </div>
