@@ -1,4 +1,3 @@
-@ -1,154 +0,0 @@
 @props(['title' => 'FunShirt'])
 <!DOCTYPE html>
 <html lang="pt">
