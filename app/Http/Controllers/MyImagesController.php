@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -35,14 +36,25 @@ class MyImagesController extends Controller
     {
         $customerId = Auth::user()->customer->id;
         $data = $request->validated();
+        $file = $request->file('image');
 
-        TshirtImage::create([
+        $image = TshirtImage::create([
             'customer_id' => $customerId,
             'category_id' => $data['category_id'] ?? null,
             'name'        => $data['name'],
             'description' => $data['description'] ?? null,
-            'image_url'   => $request->file('image')->store('tshirt_images', 'public'),
+            'image_url'   => 'temp_file',
         ]);
+
+        $id = str_pad($image->id, 5, '0', STR_PAD_LEFT);
+        $randomString = Str::random(10);
+        $extension = $file->getClientOriginalExtension();
+        $filename = "{$id}_{$randomString}.{$extension}";
+
+        $file->storeAs('tshirt_images', $filename, 'public'); // Publica
+        $file->storeAs('private/tshirt_images_private', $filename, 'local'); // Privada
+
+        $image->update(['image_url' => $filename]);
 
         return back()->with('success', 'Imagem adicionada.');
     }
@@ -61,10 +73,23 @@ class MyImagesController extends Controller
         ];
 
         if ($request->hasFile('image')) {
+            $file = $request->file('image');
+
             if ($image->image_url) {
-                Storage::disk('public')->delete($image->image_url);
+                $oldFilename = basename($image->image_url);
+                Storage::disk('public')->delete('tshirt_images/' . $oldFilename);
+                Storage::disk('local')->delete('private/tshirt_images_private/' . $oldFilename);
             }
-            $updateData['image_url'] = $request->file('image')->store('tshirt_images', 'public');
+
+            $id = str_pad($image->id, 5, '0', STR_PAD_LEFT);
+            $randomString = Str::random(10);
+            $extension = $file->getClientOriginalExtension();
+            $filename = "{$id}_{$randomString}.{$extension}";
+
+            $file->storeAs('tshirt_images', $filename, 'public');
+            $file->storeAs('private/tshirt_images_private', $filename, 'local');
+
+            $updateData['image_url'] = $filename;
         }
 
         $image->update($updateData);
@@ -79,7 +104,9 @@ class MyImagesController extends Controller
         }
 
         if ($image->image_url) {
-            Storage::disk('public')->delete($image->image_url);
+            $filename = basename($image->image_url);
+            Storage::disk('public')->delete('tshirt_images/' . $filename);
+            Storage::disk('local')->delete('private/tshirt_images_private/' . $filename);
         }
 
         $image->delete();
@@ -89,14 +116,12 @@ class MyImagesController extends Controller
 
     public function servePrivateImage(string $filename): BinaryFileResponse
     {
-        // Proteção básica para evitar navegação de diretórios (Directory Traversal)
         $filename = basename($filename);
 
         foreach (['tshirt_images_private', 'tshirt_images'] as $dir) {
             $path = storage_path('app/private/' . $dir . '/' . $filename);
 
             if (file_exists($path)) {
-                // Adicionei strtolower para garantir que apanha extensões como .JPG
                 $isJpeg = str_ends_with(strtolower($filename), '.jpg') || str_ends_with(strtolower($filename), '.jpeg');
                 $mime = $isJpeg ? 'image/jpeg' : 'image/png';
 

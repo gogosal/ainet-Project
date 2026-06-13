@@ -1,68 +1,43 @@
 @extends('layouts.app', ['title' => 'FunShirt'])
 @section('content')
-    @php
-        $featuredDesigns = App\Models\TshirtImage::whereNull('customer_id')->with('category')->take(4)->get();
-        $totalDesigns = App\Models\TshirtImage::whereNull('customer_id')->count();
-    @endphp
-
-    <style>
-        .product-link {
-            text-decoration: none;
-            display: block;
-        }
-
-        .product-link:hover .product-img-wrap {
-            border-color: #7c6fa0;
-        }
-
-        .product-link:hover .product-name {
-            color: #7c6fa0;
-        }
-    </style>
 
     {{-- ══ HERO ══ --}}
-    <section style="margin: -2.5rem -2rem 0; border-bottom: 1px solid #e0ddd8;">
-        <div
-            style="max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 56px); align-items: stretch;">
+    <section class="-mx-8 -mt-10 border-b border-[#e0ddd8]">
+        <div class="max-w-[1280px] mx-auto px-8 grid grid-cols-2 min-h-[calc(100vh-56px)] items-stretch">
 
             {{-- LEFT: Text --}}
-            <div
-                style="display: flex; flex-direction: column; justify-content: center; padding: 5rem 4rem 5rem 0; border-right: 1px solid #e0ddd8;">
-                <div
-                    style="font-size: .6rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #b8b4ae; margin-bottom: 1.5rem;">
+            <div class="flex flex-col justify-center py-20 pr-16 border-r border-[#e0ddd8]">
+                <div class="text-[.6rem] font-bold tracking-[.2em] uppercase text-[#b8b4ae] mb-6">
                     {{ $totalDesigns }}+ designs · Provador 3D · Entrega rápida
                 </div>
 
                 <h1
-                    style="font-size: clamp(2.6rem, 4vw, 4rem); font-weight: 300; line-height: 1.08; letter-spacing: -.04em; color: #1a1a1a; margin: 0 0 2rem;">
+                    class="text-[clamp(2.6rem,4vw,4rem)] font-light leading-[1.08] tracking-[-.04em] text-[#1a1a1a] mb-8 mt-0">
                     T-shirts feitas<br>
-                    para <em style="font-weight: 700; font-style: italic;">ti.</em>
+                    para <em class="font-bold italic">ti.</em>
                 </h1>
 
-                <p style="color: #888; font-size: .95rem; line-height: 1.75; margin: 0 0 2.5rem; max-width: 380px;">
+                <p class="text-[#888] text-[.95rem] leading-[1.75] mb-10 mt-0 max-w-[380px]">
                     Escolhe um design, experimenta no Provador 3D, personaliza cor e tamanho. Receberes em casa.
                 </p>
 
-                <div style="display: flex; gap: .75rem; align-items: center;">
+                <div class="flex gap-3 items-center">
                     <a href="{{ route('catalog') }}"
-                        style="font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #f5f4f1; background: #1a1a1a; text-decoration: none; padding: .75rem 1.75rem; border-radius: 1px; transition: background .15s;"
-                        onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1a1a1a'">
+                        class="text-[.7rem] font-bold tracking-[.14em] uppercase text-[#f5f4f1] bg-[#1a1a1a] no-underline px-7 py-3 rounded-[1px] transition-colors duration-150 hover:bg-[#333]">
                         Ver Catálogo
                     </a>
                     <a href="{{ route('view3d') }}"
-                        style="font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #888; text-decoration: none; padding: .75rem 1.5rem; border: 1px solid #d8d5d0; border-radius: 1px; transition: all .15s;"
-                        onmouseover="this.style.borderColor='#1a1a1a';this.style.color='#1a1a1a'"
-                        onmouseout="this.style.borderColor='#d8d5d0';this.style.color='#888'">
+                        class="text-[.7rem] font-bold tracking-[.14em] uppercase text-[#888] no-underline px-6 py-3 border border-[#d8d5d0] rounded-[1px] transition-all duration-150 hover:border-[#1a1a1a] hover:text-[#1a1a1a]">
                         Provador 3D
                     </a>
                 </div>
             </div>
 
             {{-- RIGHT: 3D rotating shirt --}}
-            <div id="hero-3d-wrap" style="border-left:1px solid #e0ddd8;position:relative;overflow:hidden;">
-                <canvas id="hero-canvas" style="width:100%;height:100%;display:block;"></canvas>
+            <div id="hero-3d-wrap" class="border-l border-[#e0ddd8] relative overflow-hidden">
+                <canvas id="hero-canvas" class="w-full h-full block"></canvas>
                 <div
-                    style="position:absolute;bottom:1.25rem;left:50%;transform:translateX(-50%);font-size:.58rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#c8c4be;pointer-events:none;white-space:nowrap;">
+                    class="absolute bottom-5 left-1/2 -translate-x-1/2 text-[.58rem] font-bold tracking-[.16em] uppercase text-[#c8c4be] pointer-events-none whitespace-nowrap">
                     ↔ Provador 3D
                 </div>
             </div>
@@ -70,15 +45,16 @@
     </section>
 
     {{-- ══ STATS BAR ══ --}}
-    <section style="border-bottom: 1px solid #e0ddd8; margin: 0 -2rem;">
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); padding: 0 2rem;">
+    <section class="border-b border-[#e0ddd8] -mx-8">
+        <div class="grid grid-cols-4 px-8">
             @foreach ([[$totalDesigns . '+', 'designs únicos'], ['6', 'cores disponíveis'], ['€15', 'preço desde'], ['3–5 dias', 'entrega em casa']] as $i => $s)
-                <div style="padding: 1.25rem 0; text-align: center; {{ $i < 3 ? 'border-right: 1px solid #e0ddd8;' : '' }}">
-                    <div style="font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; color: #1a1a1a;">
-                        {{ $s[0] }}</div>
-                    <div
-                        style="color: #b8b4ae; font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; margin-top: .15rem;">
-                        {{ $s[1] }}</div>
+                <div class="py-5 text-center {{ $i < 3 ? 'border-r border-[#e0ddd8]' : '' }}">
+                    <div class="text-[1.35rem] font-bold tracking-[-.02em] text-[#1a1a1a]">
+                        {{ $s[0] }}
+                    </div>
+                    <div class="text-[#b8b4ae] text-[.7rem] font-semibold tracking-[.1em] uppercase mt-0.5">
+                        {{ $s[1] }}
+                    </div>
                 </div>
             @endforeach
         </div>
@@ -86,54 +62,46 @@
 
     {{-- ══ FEATURED PRODUCTS ══ --}}
     @if ($featuredDesigns->count() > 0)
-        <section style="padding: 5rem 0; border-bottom: 1px solid #e0ddd8; margin: 0 -2rem;">
-            <div style="padding: 0 2rem;">
+        <section class="py-20 border-b border-[#e0ddd8] -mx-8">
+            <div class="px-8">
 
-                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2.5rem;">
+                <div class="flex items-baseline justify-between mb-10">
                     <div>
-                        <div
-                            style="font-size: .6rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #b8b4ae; margin-bottom: .4rem;">
-                            Em destaque</div>
-                        <h2
-                            style="font-size: 1.75rem; font-weight: 300; letter-spacing: -.03em; color: #1a1a1a; margin: 0;">
-                            Os mais <em style="font-weight: 700; font-style: italic;">populares.</em></h2>
+                        <div class="text-[.6rem] font-bold tracking-[.2em] uppercase text-[#b8b4ae] mb-1.5">
+                            Em destaque
+                        </div>
+                        <h2 class="text-[1.75rem] font-light tracking-[-.03em] text-[#1a1a1a] m-0">
+                            Os mais <em class="font-bold italic">populares.</em>
+                        </h2>
                     </div>
                     <a href="{{ route('catalog') }}"
-                        style="font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #7c6fa0; text-decoration: none; transition: color .15s;"
-                        onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#7c6fa0'">
+                        class="text-[.68rem] font-bold tracking-[.12em] uppercase text-[#7c6fa0] no-underline transition-colors duration-150 hover:text-[#1a1a1a]">
                         Ver todos →
                     </a>
                 </div>
 
-                <div
-                    style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid #e0ddd8; border-radius: 2px; overflow: hidden;">
+                <div class="grid grid-cols-4 gap-0 border border-[#e0ddd8] rounded-[2px] overflow-hidden">
                     @foreach ($featuredDesigns as $i => $d)
-                        <a href="{{ route('catalog') }}" class="product-link"
-                            style="background: #fff; {{ $i < 3 ? 'border-right: 1px solid #e0ddd8;' : '' }} transition: background .15s;"
-                            onmouseover="this.style.background='#f9f8f6'" onmouseout="this.style.background='#fff'">
-                            @php
-                                $dBare = basename($d->image_url);
-                                $dUrl = \Illuminate\Support\Str::startsWith($d->image_url, 'tshirt_images_private/')
-                                    ? route('private-image', $dBare)
-                                    : (str_contains($d->image_url, '/')
-                                        ? asset('storage/' . $d->image_url)
-                                        : asset('storage/tshirt_images/' . $dBare));
-                            @endphp
-                            <div class="product-img-wrap"
-                                style="background:#fff;display:flex;align-items:center;justify-content:center;height:200px;border-bottom:1px solid #e0ddd8;transition:border-color .15s;padding:1.5rem;overflow:hidden;">
-                                <img src="{{ $dUrl }}" alt="{{ $d->name }}"
-                                    style="max-width:100%;max-height:100%;object-fit:contain;display:block;">
+                        <a href="{{ route('catalog') }}"
+                            class="group block no-underline bg-white {{ $i < 3 ? 'border-r border-[#e0ddd8]' : '' }} transition-colors duration-150 hover:bg-[#f9f8f6]">
+
+                            <div
+                                class="bg-white flex items-center justify-center h-[200px] border-b border-[#e0ddd8] transition-colors duration-150 p-6 overflow-hidden group-hover:border-[#7c6fa0]">
+                                <img src="{{ $d->display_url }}" alt="{{ $d->name }}"
+                                    class="max-w-full max-h-full object-contain block">
                             </div>
-                            <div style="padding: .9rem 1rem 1.1rem;">
+
+                            <div class="px-4 pt-[0.9rem] pb-[1.1rem]">
                                 @if ($d->category)
-                                    <div
-                                        style="font-size: .58rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #7c6fa0; margin-bottom: .3rem;">
-                                        {{ $d->category->name }}</div>
+                                    <div class="text-[.58rem] font-bold tracking-[.12em] uppercase text-[#7c6fa0] mb-1">
+                                        {{ $d->category->name }}
+                                    </div>
                                 @endif
-                                <div class="product-name"
-                                    style="color: #1a1a1a; font-size: .85rem; font-weight: 600; margin-bottom: .25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .15s;">
-                                    {{ $d->name }}</div>
-                                <div style="color: #888; font-size: .8rem; font-weight: 500;">€15.00</div>
+                                <div
+                                    class="text-[#1a1a1a] text-[.85rem] font-semibold mb-1 whitespace-nowrap overflow-hidden text-ellipsis transition-colors duration-150 group-hover:text-[#7c6fa0]">
+                                    {{ $d->name }}
+                                </div>
+                                <div class="text-[#888] text-[.8rem] font-medium">€10.00</div>
                             </div>
                         </a>
                     @endforeach
@@ -143,30 +111,31 @@
     @endif
 
     {{-- ══ HOW IT WORKS ══ --}}
-    <section style="padding: 5rem 0; border-bottom: 1px solid #e0ddd8; margin: 0 -2rem;">
-        <div style="padding: 0 2rem; display: grid; grid-template-columns: 1fr 2fr; gap: 5rem; align-items: start;">
+    <section class="py-20 border-b border-[#e0ddd8] -mx-8">
+        <div class="px-8 grid grid-cols-[1fr_2fr] gap-20 items-start">
 
             <div>
-                <div
-                    style="font-size: .6rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #b8b4ae; margin-bottom: .9rem;">
-                    Processo</div>
-                <h2
-                    style="font-size: 1.75rem; font-weight: 300; letter-spacing: -.03em; color: #1a1a1a; margin: 0 0 1.25rem;">
-                    Como <em style="font-weight: 700; font-style: italic;">funciona.</em></h2>
-                <p style="color: #aaa; font-size: .85rem; line-height: 1.7; margin: 0;">Em três passos tens a tua t-shirt à
-                    porta — sem complicações.</p>
+                <div class="text-[.6rem] font-bold tracking-[.2em] uppercase text-[#b8b4ae] mb-3.5">
+                    Processo
+                </div>
+                <h2 class="text-[1.75rem] font-light tracking-[-.03em] text-[#1a1a1a] mb-5 mt-0">
+                    Como <em class="font-bold italic">funciona.</em>
+                </h2>
+                <p class="text-[#aaa] text-[.85rem] leading-[1.7] m-0">
+                    Em três passos tens a tua t-shirt à porta — sem complicações.
+                </p>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-left: 1px solid #e0ddd8;">
+            <div class="grid grid-cols-3 gap-0 border-l border-[#e0ddd8]">
                 @foreach ([['01', 'Escolhe o design', 'Explora o catálogo com mais de ' . $totalDesigns . ' designs. Filtra por categoria ou pesquisa o que queres.'], ['02', 'Experimenta em 3D', 'Usa o Provador 3D para escolher cor e tamanho. Vê o resultado real antes de encomendar.'], ['03', 'Recebe em casa', 'Checkout seguro. Recebes confirmação por e-mail e a t-shirt em 3 a 5 dias úteis.']] as $step)
-                    <div style="padding: 1.5rem; border-right: 1px solid #e0ddd8;">
-                        <div
-                            style="font-size: .62rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #c8c4be; margin-bottom: 1rem;">
-                            {{ $step[0] }}</div>
-                        <h3
-                            style="font-size: .92rem; font-weight: 700; color: #1a1a1a; margin: 0 0 .6rem; letter-spacing: -.01em;">
-                            {{ $step[1] }}</h3>
-                        <p style="color: #aaa; font-size: .8rem; line-height: 1.65; margin: 0;">{{ $step[2] }}</p>
+                    <div class="p-6 border-r border-[#e0ddd8]">
+                        <div class="text-[.62rem] font-bold tracking-[.16em] uppercase text-[#c8c4be] mb-4">
+                            {{ $step[0] }}
+                        </div>
+                        <h3 class="text-[.92rem] font-bold text-[#1a1a1a] mb-2 mt-0 tracking-[-.01em]">
+                            {{ $step[1] }}
+                        </h3>
+                        <p class="text-[#aaa] text-[.8rem] leading-[1.65] m-0">{{ $step[2] }}</p>
                     </div>
                 @endforeach
             </div>
@@ -174,51 +143,34 @@
     </section>
 
     {{-- ══ CTA BANNER ══ --}}
-    <section style="padding: 5rem 0; margin: 0 -2rem;">
-        <div
-            style="margin: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; align-items: center; border: 1px solid #e0ddd8; border-radius: 2px; overflow: hidden;">
+    <section class="py-20 -mx-8">
+        <div class="mx-8 grid grid-cols-2 items-center border border-[#e0ddd8] rounded-[2px] overflow-hidden">
 
-            <div style="padding: 4rem;">
-                <div
-                    style="font-size: .6rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #b8b4ae; margin-bottom: .9rem;">
-                    Começa agora</div>
-                <h2
-                    style="font-size: 2rem; font-weight: 300; letter-spacing: -.03em; color: #1a1a1a; margin: 0 0 1.5rem; line-height: 1.1;">
-                    A tua t-shirt<br><em style="font-weight: 700; font-style: italic;">perfeita espera.</em>
+            <div class="p-16">
+                <div class="text-[.6rem] font-bold tracking-[.2em] uppercase text-[#b8b4ae] mb-3.5">
+                    Começa agora
+                </div>
+                <h2 class="text-[2rem] font-light tracking-[-.03em] text-[#1a1a1a] mb-6 mt-0 leading-[1.1]">
+                    A tua t-shirt<br><em class="font-bold italic">perfeita espera.</em>
                 </h2>
-                <div style="display: flex; gap: .75rem; align-items: center; flex-wrap: wrap;">
+                <div class="flex gap-3 items-center flex-wrap">
                     <a href="{{ route('catalog') }}"
-                        style="font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #f5f4f1; background: #1a1a1a; text-decoration: none; padding: .75rem 1.75rem; border-radius: 1px; transition: background .15s;"
-                        onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1a1a1a'">
+                        class="text-[.7rem] font-bold tracking-[.14em] uppercase text-[#f5f4f1] bg-[#1a1a1a] no-underline px-7 py-3 rounded-[1px] transition-colors duration-150 hover:bg-[#333]">
                         Explorar catálogo
                     </a>
                     @guest
                         <a href="{{ route('register') }}"
-                            style="font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #888; text-decoration: none; padding: .75rem 1.5rem; border: 1px solid #d8d5d0; border-radius: 1px; transition: all .15s;"
-                            onmouseover="this.style.borderColor='#1a1a1a';this.style.color='#1a1a1a'"
-                            onmouseout="this.style.borderColor='#d8d5d0';this.style.color='#888'">
+                            class="text-[.7rem] font-bold tracking-[.14em] uppercase text-[#888] no-underline px-6 py-3 border border-[#d8d5d0] rounded-[1px] transition-all duration-150 hover:border-[#1a1a1a] hover:text-[#1a1a1a]">
                             Criar conta
                         </a>
                     @endguest
                 </div>
             </div>
 
-            <div
-                style="background:#eeecea;height:100%;display:flex;align-items:center;justify-content:center;padding:3rem;border-left:1px solid #e0ddd8;min-height:300px;">
-                @if ($featuredDesigns->first())
-                    @php
-                        $ctaBare = basename($featuredDesigns->first()->image_url);
-                        $ctaUrl = \Illuminate\Support\Str::startsWith(
-                            $featuredDesigns->first()->image_url,
-                            'tshirt_images_private/',
-                        )
-                            ? route('private-image', $ctaBare)
-                            : (str_contains($featuredDesigns->first()->image_url, '/')
-                                ? asset('storage/' . $featuredDesigns->first()->image_url)
-                                : asset('storage/tshirt_images/' . $ctaBare));
-                    @endphp
-                    <img src="{{ $ctaUrl }}" alt=""
-                        style="max-width:200px;max-height:200px;object-fit:contain;display:block;">
+            <div class="bg-[#eeecea] h-full flex items-center justify-center p-12 border-l border-[#e0ddd8] min-h-[300px]">
+                @if ($ctaUrl)
+                    <img src="{{ $ctaUrl }}" alt="Featured Design"
+                        class="max-w-[200px] max-h-[200px] object-contain block">
                 @endif
             </div>
         </div>
@@ -277,7 +229,7 @@
                         metalness: 0.02
                     });
                     child.material = Array.isArray(child.material) ? child.material.map(() => mat
-                    .clone()) : mat;
+                        .clone()) : mat;
                 });
                 gltf.scene.updateMatrixWorld(true);
 
@@ -302,7 +254,6 @@
                 camera.position.set(0, mc.y, ms.y * 2.2);
                 camera.lookAt(0, mc.y, 0);
 
-                // Force front-facing before adding to scene
                 currentRotY = 0;
                 targetRotY = 0;
                 shirtGroup.rotation.y = 0;
@@ -310,45 +261,38 @@
                 applyDesign();
             });
 
-            // ── Clean minimal design: thin circle + "FUN" wordmark ──
             function drawDesign(ctx, cx, cy, R) {
                 ctx.save();
                 ctx.translate(cx, cy);
 
-                // Filled dark background circle so design is always visible
                 ctx.beginPath();
                 ctx.arc(0, 0, R * 1.02, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(245,244,241,0)';
                 ctx.fill();
 
-                // Thin outer ring
                 ctx.beginPath();
                 ctx.arc(0, 0, R, 0, Math.PI * 2);
                 ctx.strokeStyle = '#1a1a1a';
                 ctx.lineWidth = R * 0.05;
                 ctx.stroke();
 
-                // Inner thin ring
                 ctx.beginPath();
                 ctx.arc(0, 0, R * 0.8, 0, Math.PI * 2);
                 ctx.lineWidth = R * 0.02;
                 ctx.stroke();
 
-                // "FUN" large bold text
                 ctx.fillStyle = '#1a1a1a';
                 ctx.font = '700 ' + Math.round(R * 0.52) + 'px Inter,system-ui,sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('FUN', 0, -R * 0.08);
 
-                // thin divider line
                 ctx.beginPath();
                 ctx.moveTo(-R * 0.4, R * 0.26);
                 ctx.lineTo(R * 0.4, R * 0.26);
                 ctx.lineWidth = R * 0.025;
                 ctx.stroke();
 
-                // "SHIRT" small caps
                 ctx.font = '600 ' + Math.round(R * 0.19) + 'px Inter,system-ui,sans-serif';
                 ctx.fillText('SHIRT', 0, R * 0.45);
 
@@ -375,7 +319,6 @@
                 });
             }
 
-            // ── Mouse parallax (small range so front is always visible) ──
             var targetRotY = 0;
             var currentRotY = 0;
 

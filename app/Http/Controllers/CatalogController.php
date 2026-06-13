@@ -20,13 +20,16 @@ class CatalogController extends Controller
         $categoryId = $request->query('category');
 
         $images = TshirtImage::query()
-            ->whereNull('customer_id')
-            ->when($search, fn ($q) => $q->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%'.$search.'%')
-                  ->orWhere('description', 'like', '%'.$search.'%');
+            ->where(function ($query) {
+                $query->whereNull('customer_id')
+                    ->orWhere('customer_id', auth()->id());
+            })
+            ->when($search, fn($q) => $q->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
             }))
-            ->when($categoryId === '-1', fn ($q) => $q->whereNull('category_id'))
-            ->when($categoryId > 0, fn ($q) => $q->where('category_id', $categoryId))
+            ->when($categoryId === '-1', fn($q) => $q->whereNull('category_id'))
+            ->when($categoryId > 0, fn($q) => $q->where('category_id', $categoryId))
             ->with('category')
             ->orderBy('name')
             ->paginate(12)

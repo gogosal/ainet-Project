@@ -13,7 +13,10 @@ class StaffController extends Controller
 {
     public function index(): View
     {
-        $staff = User::whereIn('user_type', ['F', 'A'])->orderBy('name')->get();
+        $staff = User::whereIn('user_type', ['F', 'A'])
+            ->where('id', '!=', auth()->id())
+            ->orderBy('name')
+            ->get();
 
         $roles = [
             'A' => 'Administrador',

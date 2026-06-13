@@ -20,6 +20,13 @@ class OrderController extends Controller
         return view('employee.orders.index', compact('orders'));
     }
 
+    public function show(Order $order): View
+    {
+        $order->load(['customer.user', 'items.tshirtImage', 'items.color']);
+
+        return view('employee.orders.show', compact('order'));
+    }
+
     public function close(Order $order): RedirectResponse
     {
         if (! $order->isPending()) {
@@ -31,7 +38,7 @@ class OrderController extends Controller
         try {
             app(OrderService::class)->closeOrder($order);
         } catch (\Exception $e) {
-            \Log::error('closeOrder failed: '.$e->getMessage());
+            \Log::error('closeOrder failed: ' . $e->getMessage());
         }
 
         return back()->with('success', "Encomenda #{$order->id} marcada como fechada.");

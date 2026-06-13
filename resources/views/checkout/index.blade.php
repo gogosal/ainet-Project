@@ -35,15 +35,20 @@
                                 value="{{ old('nif', auth()->user()->customer?->nif) }}"
                                 class="w-full bg-white border rounded-[6px] px-3 py-2.5 text-fs-dark text-[0.9rem] outline-none box-border
                                       {{ $errors->has('nif') ? 'border-red-400' : 'border-fs-border' }}
-                                      focus:border-fs-purple">
+                                      focus:border-[#1a1a1a]">
                             @error('nif')
                                 <p class="text-red-400 text-[0.73rem] mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
-                            <label class="block text-fs-gray text-[0.78rem] font-medium mb-1.5">Nome</label>
+                            <label class="block mb-1.5 text-[0.78rem] font-medium text-fs-gray">
+                                Nome
+                            </label>
+
                             <input type="text" value="{{ auth()->user()->name }}" readonly
-                                class="w-full bg-[#0d0d1a] border border-fs-border rounded-[6px] px-3 py-2.5 text-fs-muted text-[0.9rem] outline-none box-border">
+                                class="w-full bg-[#f7f6f4] border border-fs-border rounded-[6px]
+       px-3 py-2.5 text-fs-dark text-[0.9rem]
+       cursor-not-allowed outline-none">
                         </div>
                     </div>
 
@@ -52,7 +57,7 @@
                         <textarea name="address" rows="2" placeholder="Rua, número, código postal, cidade"
                             class="w-full bg-white border rounded-[6px] px-3 py-2.5 text-fs-dark text-[0.9rem] outline-none box-border resize-y
                                      {{ $errors->has('address') ? 'border-red-400' : 'border-fs-border' }}
-                                     focus:border-fs-purple">{{ old('address', auth()->user()->customer?->address) }}</textarea>
+                                     focus:border-[#1a1a1a]">{{ old('address', auth()->user()->customer?->address) }}</textarea>
                         @error('address')
                             <p class="text-red-400 text-[0.73rem] mt-1">{{ $message }}</p>
                         @enderror
@@ -67,24 +72,24 @@
                         <button type="button" @click="paymentType = 'Visa'"
                             :class="paymentType === 'Visa'
                                 ?
-                                'bg-fs-purple/20 text-fs-purple border-fs-purple' :
-                                'bg-white text-fs-muted border-fs-border'"
+                                'bg-[#f7f6f4] text-fs-dark border-[#1a1a1a]' :
+                                'bg-white text-fs-muted border-fs-border hover:border-[#b8b4ae]'"
                             class="flex-1 border rounded-lg px-2 py-2.5 text-[0.82rem] font-medium cursor-pointer transition-all duration-150">
                             💳 Visa
                         </button>
                         <button type="button" @click="paymentType = 'PayPal'"
                             :class="paymentType === 'PayPal'
                                 ?
-                                'bg-fs-purple/20 text-fs-purple border-fs-purple' :
-                                'bg-white text-fs-muted border-fs-border'"
+                                'bg-[#f7f6f4] text-fs-dark border-[#1a1a1a]' :
+                                'bg-white text-fs-muted border-fs-border hover:border-[#b8b4ae]'"
                             class="flex-1 border rounded-lg px-2 py-2.5 text-[0.82rem] font-medium cursor-pointer transition-all duration-150">
                             🅿 PayPal
                         </button>
                         <button type="button" @click="paymentType = 'MB WAY'"
                             :class="paymentType === 'MB WAY'
                                 ?
-                                'bg-fs-purple/20 text-fs-purple border-fs-purple' :
-                                'bg-white text-fs-muted border-fs-border'"
+                                'bg-[#f7f6f4] text-fs-dark border-[#1a1a1a]' :
+                                'bg-white text-fs-muted border-fs-border hover:border-[#b8b4ae]'"
                             class="flex-1 border rounded-lg px-2 py-2.5 text-[0.82rem] font-medium cursor-pointer transition-all duration-150">
                             📱 MB WAY
                         </button>
@@ -99,13 +104,19 @@
                             <span x-show="paymentType === 'PayPal'">Email PayPal *</span>
                             <span x-show="paymentType === 'MB WAY'">Número de telemóvel (9 dígitos) *</span>
                         </label>
-                        <input name="payment_ref" :type="paymentType === 'PayPal' ? 'email' : 'text'"
-                            :placeholder="paymentType === 'Visa' ? '4XXXXXXXXXXXXXXX' : (paymentType === 'PayPal' ?
-                                'email@paypal.com' : '9XXXXXXXX')"
+                        <input name="payment_ref"
+                            :maxlength="paymentType === 'MB WAY' ? 9 : (paymentType === 'Visa' ? 16 : null)"
+                            :type="paymentType === 'PayPal' ? 'email' : 'text'"
+                            :placeholder="paymentType === 'Visa'
+                                ?
+                                '4XXXXXXXXXXXXXXX' :
+                                (paymentType === 'PayPal' ?
+                                    'email@paypal.com' :
+                                    '9XXXXXXXX')"
                             value="{{ old('payment_ref', auth()->user()->customer?->default_payment_ref) }}"
                             class="w-full bg-white border rounded-[6px] px-3 py-2.5 text-fs-dark text-[0.9rem] outline-none box-border
-                                  {{ $errors->has('payment_ref') ? 'border-red-400' : 'border-fs-border' }}
-                                  focus:border-fs-purple">
+        {{ $errors->has('payment_ref') ? 'border-red-400' : 'border-fs-border' }}
+        focus:border-[#1a1a1a]">
                         @error('payment_ref')
                             <p class="text-red-400 text-[0.73rem] mt-1">{{ $message }}</p>
                         @enderror
@@ -115,11 +126,14 @@
                     <div class="mb-6">
                         <label class="block text-fs-gray text-[0.78rem] font-medium mb-1.5">Notas (opcional)</label>
                         <textarea name="notes" rows="2" placeholder="Instruções especiais para a encomenda..."
-                            class="w-full bg-white border border-fs-border rounded-[6px] px-3 py-2.5 text-fs-dark text-[0.9rem] outline-none box-border resize-y focus:border-fs-purple">{{ old('notes') }}</textarea>
+                            class="w-full bg-white border border-fs-border rounded-[6px] px-3 py-2.5 text-fs-dark text-[0.9rem] outline-none box-border resize-y focus:border-[#1a1a1a]">{{ old('notes') }}</textarea>
                     </div>
 
                     <button type="submit"
-                        class="w-full bg-fs-purple text-white border-none rounded-lg py-3.5 text-[0.95rem] font-bold cursor-pointer transition-colors duration-200 hover:bg-[#6b5f90]">
+                        class="w-full bg-[#1a1a1a] text-white border border-[#1a1a1a]
+           rounded-[2px] py-3.5 text-[0.9rem] font-semibold
+           tracking-[0.02em] cursor-pointer
+           transition-colors duration-200 hover:bg-[#2b2b2b]">
                         🔒 Confirmar e pagar €{{ number_format($total, 2) }}
                     </button>
                 </form>
@@ -143,7 +157,7 @@
                                 </p>
                             </div>
                             <span
-                                class="text-[0.82rem] font-semibold {{ $item['has_discount'] ? 'text-[#4ade80]' : 'text-fs-purple' }}">
+                                class="text-[0.82rem] font-semibold {{ $item['has_discount'] ? 'text-[#2d6a4f]' : 'text-fs-dark' }}">
                                 €{{ number_format($item['sub_total'], 2) }}
                             </span>
                         </div>
@@ -152,7 +166,7 @@
                 <div class="border-t border-fs-border pt-3">
                     <div class="flex justify-between items-center">
                         <span class="text-fs-dark font-semibold text-[0.95rem]">Total</span>
-                        <span class="text-fs-purple font-bold text-[1.1rem]">€{{ number_format($total, 2) }}</span>
+                        <span class="text-fs-dark font-bold text-[1.1rem]">€{{ number_format($total, 2) }}</span>
                     </div>
                     <p class="text-fs-muted text-[0.72rem] mt-2 mb-0">
                         Pagamento simulado — não são debitados valores reais.

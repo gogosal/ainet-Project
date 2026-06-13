@@ -14,7 +14,7 @@ class OrderCancelRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reason' => 'required|string|max:500',
+            'reason' => 'nullable|string|max:500',
         ];
     }
 }

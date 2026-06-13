@@ -12,7 +12,7 @@ use App\Http\Controllers\Employee;
 use App\Http\Controllers\Admin;
 
 // Home landing page
-Route::get('/', fn() => view('landing'))->name('landing');
+Route::get('/', [App\Http\Controllers\LandingController::class, 'index'])->name('landing');
 
 // Serve private tshirt images
 Route::get('/private-image/{filename}', [MyImagesController::class, 'servePrivateImage'])->name('private-image');
@@ -36,6 +36,22 @@ Route::patch('/cart/{index}', [CartController::class, 'update'])->name('cart.upd
 Route::delete('/cart/{index}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
+// Save cart on login
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+
+    $cart = $request->session()->get('cart');
+
+    auth()->guard('web')->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    if ($cart) {
+        $request->session()->put('cart', $cart);
+    }
+
+    return redirect('/');
+})->name('logout');
+
 require __DIR__ . '/settings.php';
 
 // Authenticated + verified
@@ -44,10 +60,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/my-images', [MyImagesController::class, 'store'])->name('my-images.store');
     Route::put('/my-images/{image}', [MyImagesController::class, 'update'])->name('my-images.update');
     Route::delete('/my-images/{image}', [MyImagesController::class, 'destroy'])->name('my-images.destroy');
-
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
-    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
@@ -63,7 +75,15 @@ Route::middleware(['auth', 'verified', 'user.type:C'])->group(function () {
 // Employee
 Route::middleware(['auth', 'user.type:F'])->group(function () {
     Route::get('/employee/orders', [Employee\OrderController::class, 'index'])->name('employee.orders');
+    Route::get('/employee/orders/{order}', [Employee\OrderController::class, 'show'])->name('employee.orders.show');
     Route::post('/employee/orders/{order}/close', [Employee\OrderController::class, 'close'])->name('employee.orders.close');
+});
+
+// Admin + Client
+Route::middleware(['auth', 'user.type:A,C'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
 });
 
 // Admin

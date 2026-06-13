@@ -16,6 +16,8 @@ class OrderController extends Controller
     {
         $search = $request->query('search', '');
         $statusFilter = $request->query('status', 'all');
+        $dateFrom = $request->query('date_from', '');
+        $dateTo = $request->query('date_to', '');
 
         $orders = Order::with('customer.user')
             ->when($search, fn($q) => $q->where(function ($q) use ($search) {
@@ -23,11 +25,13 @@ class OrderController extends Controller
                     ->orWhereHas('customer.user', fn($q) => $q->where('name', 'like', "%{$search}%"));
             }))
             ->when($statusFilter !== 'all', fn($q) => $q->where('status', $statusFilter))
+            ->when($dateFrom, fn($q) => $q->whereDate('date', '>=', $dateFrom))
+            ->when($dateTo, fn($q) => $q->whereDate('date', '<=', $dateTo))
             ->latest()
             ->paginate(20)
             ->appends($request->query());
 
-        return view('admin.orders.index', compact('orders', 'search', 'statusFilter'));
+        return view('admin.orders.index', compact('orders', 'search', 'statusFilter', 'dateFrom', 'dateTo'));
     }
 
     public function show(Order $order): View

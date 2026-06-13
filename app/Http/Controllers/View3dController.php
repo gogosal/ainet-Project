@@ -10,6 +10,7 @@ use App\Models\TshirtImage;
 use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class View3dController extends Controller
@@ -18,8 +19,18 @@ class View3dController extends Controller
     {
         $search = $request->query('search', '');
         $categoryId = $request->query('category_id', '');
+        $customerId = Auth::user()?->customer?->id;
 
-        $query = TshirtImage::whereNull('customer_id')->with('category')->orderBy('name');
+        $query = TshirtImage::query()
+            ->where(function ($q) use ($customerId) {
+                $q->whereNull('customer_id');
+                if ($customerId) {
+                    $q->orWhere('customer_id', $customerId);
+                }
+            })
+            ->with('category')
+            ->orderBy('name');
+
         if ($search) {
             $query->where('name', 'like', '%' . $search . '%');
         }
@@ -49,9 +60,17 @@ class View3dController extends Controller
                 ?? 'fafafa';
         }
 
-        $selectedImage = $selectedImageId
-            ? TshirtImage::whereNull('customer_id')->find($selectedImageId)
-            : null;
+        $selectedImage = null;
+        if ($selectedImageId) {
+            $selectedImage = TshirtImage::query()
+                ->where(function ($q) use ($customerId) {
+                    $q->whereNull('customer_id');
+                    if ($customerId) {
+                        $q->orWhere('customer_id', $customerId);
+                    }
+                })
+                ->find($selectedImageId);
+        }
 
         return view('view3d.index', compact(
             'designs',

@@ -17,7 +17,7 @@
                 class="italic font-bold">design.</em></h1>
     </div>
 
-    {{-- Alpine modal state --}}
+    {{-- Alpine modal state (Agora com suporte para preços dinâmicos) --}}
     <div x-data="{
         showModal: false,
         selectedImageId: null,
@@ -26,13 +26,17 @@
         selectedColor: '{{ $colors->first()?->code ?? '' }}',
         selectedSize: 'M',
         qty: 1,
-        openModal(id, name, imgUrl, firstColor) {
+        priceBase: 0,
+        priceDiscount: 0,
+        openModal(id, name, imgUrl, firstColor, pBase, pDiscount) {
             this.selectedImageId = id;
             this.selectedImageName = name;
             this.selectedImageUrl = imgUrl;
             this.selectedColor = firstColor;
             this.selectedSize = 'M';
             this.qty = 1;
+            this.priceBase = parseFloat(pBase);
+            this.priceDiscount = parseFloat(pDiscount);
             this.showModal = true;
         },
         closeModal() { this.showModal = false; }
@@ -116,22 +120,40 @@
 
                     <div class="h-px bg-fs-border mb-[1.4rem]"></div>
 
-                    {{-- Price --}}
+                    {{-- Price Info Sidebar --}}
                     <div>
                         <label
-                            class="block text-[0.58rem] font-bold tracking-[0.14em] uppercase text-fs-muted mb-[0.55rem]">Preço</label>
-                        <div class="px-[0.9rem] py-[0.7rem] bg-fs-light border border-fs-border rounded-[1px]">
-                            <div class="flex justify-between items-baseline mb-[0.3rem]">
-                                <span class="text-[#aaa] text-[0.75rem]">Por unidade</span>
+                            class="block text-[0.58rem] font-bold tracking-[0.14em] uppercase text-fs-muted mb-[0.55rem]">Tabela
+                            de Preços</label>
+                        <div class="px-[0.9rem] py-[0.7rem] bg-fs-light border border-fs-border rounded-[1px] mb-2">
+                            <span class="text-fs-dark font-bold text-[0.7rem] block mb-1">Designs do Catálogo</span>
+                            <div class="flex justify-between items-baseline mb-[0.2rem]">
+                                <span class="text-[#aaa] text-[0.7rem]">Base:</span>
                                 <span
-                                    class="text-fs-dark font-bold text-[0.95rem]">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
+                                    class="text-fs-dark font-bold text-[0.8rem]">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
                             </div>
-                            <div class="text-fs-muted text-[0.68rem] leading-[1.4]">
-                                Desc. a partir de {{ $prices->qty_discount }} un.
-                                <span class="text-fs-green block mt-[2px]">→
-                                    €{{ number_format($prices->unit_price_catalog_discount, 2) }}/un</span>
+                            <div class="text-fs-green text-[0.65rem] leading-[1.4]">
+                                ≥ {{ $prices->qty_discount }} un. →
+                                €{{ number_format($prices->unit_price_catalog_discount, 2) }}/un
                             </div>
                         </div>
+
+                        @auth
+                            @if (auth()->user()->isClient())
+                                <div class="px-[0.9rem] py-[0.7rem] bg-fs-light border border-fs-border rounded-[1px]">
+                                    <span class="text-fs-purple font-bold text-[0.7rem] block mb-1">Designs Próprios</span>
+                                    <div class="flex justify-between items-baseline mb-[0.2rem]">
+                                        <span class="text-[#aaa] text-[0.7rem]">Base:</span>
+                                        <span
+                                            class="text-fs-dark font-bold text-[0.8rem]">€{{ number_format($prices->unit_price_own, 2) }}</span>
+                                    </div>
+                                    <div class="text-fs-green text-[0.65rem] leading-[1.4]">
+                                        ≥ {{ $prices->qty_discount }} un. →
+                                        €{{ number_format($prices->unit_price_own_discount, 2) }}/un
+                                    </div>
+                                </div>
+                            @endif
+                        @endauth
                     </div>
 
                 </div>
@@ -147,13 +169,28 @@
                 @else
                     <div class="grid grid-cols-3 gap-4 mb-8">
                         @foreach ($images as $image)
-                            {{-- GRELHA FLEXÍVEL: Mantém os botões sempre no fundo independentemente do tamanho do texto --}}
+                            @php
+                                // Verifica se a imagem é do cliente logado para aplicar o preço correto
+                                $isOwn = !is_null($image->customer_id);
+                                $basePrice = $isOwn ? $prices->unit_price_own : $prices->unit_price_catalog;
+                                $discountPrice = $isOwn
+                                    ? $prices->unit_price_own_discount
+                                    : $prices->unit_price_catalog_discount;
+                            @endphp
+
                             <div
                                 class="bg-white border border-fs-border rounded-[2px] overflow-hidden transition-colors duration-150 hover:border-fs-purple flex flex-col h-full">
 
                                 <div
-                                    class="bg-fs-bg h-[180px] shrink-0 flex items-center justify-center border-b border-fs-border overflow-hidden p-4">
-                                    {{-- Utilizamos o Accessor do Model aqui --}}
+                                    class="bg-fs-bg h-[180px] shrink-0 flex items-center justify-center border-b border-fs-border overflow-hidden p-4 relative">
+
+                                    @if ($isOwn)
+                                        <span
+                                            class="absolute top-2 left-2 bg-fs-purple text-white text-[0.55rem] font-bold uppercase tracking-[0.1em] px-2 py-1 rounded-[1px]">
+                                            Pessoal
+                                        </span>
+                                    @endif
+
                                     <img src="{{ $image->resolved_url }}" alt="{{ $image->name }}"
                                         class="max-w-full max-h-full object-contain block"
                                         onerror="this.style.opacity='.15'">
@@ -178,17 +215,19 @@
                                         </p>
                                     @endif
 
-                                    {{-- MT-AUTO puxa isto para baixo --}}
                                     <div class="flex items-center justify-between mt-auto pt-2">
+                                        {{-- Apresenta o Preço Base Correto --}}
                                         <span
-                                            class="text-fs-dark font-bold text-[0.9rem]">€{{ number_format($prices->unit_price_catalog, 2) }}</span>
+                                            class="text-fs-dark font-bold text-[0.9rem]">€{{ number_format($basePrice, 2) }}</span>
+
                                         <div class="flex gap-[0.35rem]">
                                             <a href="{{ route('view3d', ['design' => $image->id]) }}" title="Provador 3D"
                                                 class="bg-fs-light text-fs-gray border border-fs-border px-[0.55rem] py-[0.3rem] text-[0.72rem] no-underline inline-flex items-center rounded-[1px] transition-all duration-150 hover:border-fs-purple hover:text-fs-purple">
                                                 3D
                                             </a>
+                                            {{-- Passa o Preço Base e o Preço com Desconto para o AlpineJS --}}
                                             <button type="button"
-                                                @click="openModal({{ $image->id }}, '{{ addslashes($image->name) }}', '{{ $image->resolved_url }}', '{{ $colors->first()?->code ?? '' }}')"
+                                                @click="openModal({{ $image->id }}, '{{ addslashes($image->name) }}', '{{ $image->resolved_url }}', '{{ $colors->first()?->code ?? '' }}', {{ $basePrice }}, {{ $discountPrice }})"
                                                 class="bg-fs-dark text-fs-light border-0 px-3 py-[0.3rem] text-[0.68rem] font-bold tracking-[0.08em] uppercase cursor-pointer rounded-[1px] transition-colors duration-150 hover:bg-[#333]">
                                                 + Adicionar
                                             </button>
@@ -322,18 +361,18 @@
                                 </div>
                             </div>
 
-                            {{-- Resumo de Preço Total Dinâmico --}}
+                            {{-- Resumo de Preço Total Dinâmico (Lê a variável dinâmica do Alpine) --}}
                             <div class="bg-fs-bg border border-fs-border px-3 py-[0.6rem] text-[0.75rem] rounded-[1px]">
                                 <div class="flex justify-between text-fs-gray mb-[0.3rem]">
                                     <span>Preço Total</span>
                                     <span class="text-fs-dark font-bold text-[0.95rem]"
-                                        x-text="'€' + (qty * (qty >= {{ $prices->qty_discount }} ? {{ $prices->unit_price_catalog_discount }} : {{ $prices->unit_price_catalog }})).toFixed(2)">
+                                        x-text="'€' + (qty * (qty >= {{ $prices->qty_discount }} ? priceDiscount : priceBase)).toFixed(2)">
                                     </span>
                                 </div>
                                 <div x-show="qty >= {{ $prices->qty_discount }}"
                                     class="flex justify-between text-fs-green mt-1 text-[0.7rem] transition-all">
                                     <span>✓ Desconto de quantidade aplicado</span>
-                                    <span>€{{ number_format($prices->unit_price_catalog_discount, 2) }}/un</span>
+                                    <span x-text="'€' + priceDiscount.toFixed(2) + '/un'"></span>
                                 </div>
                                 <div x-show="qty < {{ $prices->qty_discount }}"
                                     class="text-[#c8c4be] mt-1 text-[0.68rem] transition-all">

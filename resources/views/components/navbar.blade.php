@@ -1,5 +1,3 @@
-@props(['cartCount' => 0])
-
 <header class="bg-[#f5f4f1] border-b border-[#e0ddd8] sticky top-0 z-50">
     <div class="max-w-[1280px] mx-auto px-8 h-14 flex items-center gap-8">
 
@@ -22,18 +20,6 @@
             </a>
 
             @auth
-                @php
-                    $ordersRoute = match (auth()->user()->user_type) {
-                        'A' => route('admin.orders'),
-                        'F' => route('employee.orders'),
-                        default => route('orders.index'),
-                    };
-                    $ordersActive =
-                        request()->routeIs('orders*') ||
-                        request()->routeIs('admin.orders') ||
-                        request()->routeIs('employee.orders');
-                @endphp
-
                 <a href="{{ $ordersRoute }}"
                     class="text-[.7rem] font-semibold tracking-[.1em] uppercase no-underline transition-colors duration-150 hover:text-[#1a1a1a] {{ $ordersActive ? 'text-[#7c6fa0]' : 'text-[#aaa8a3]' }}">
                     Encomendas
@@ -72,14 +58,9 @@
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
                         class="flex items-center gap-[.45rem] bg-transparent border border-[#e0ddd8] rounded-full px-3 py-[.3rem] cursor-pointer text-[#1a1a1a] text-xs font-[inherit] transition-colors duration-150 hover:border-[#1a1a1a]">
-                        @if (auth()->user()->photo_url)
-                            @php
-                                $pUrl = auth()->user()->photo_url;
-                                $pSrc = str_contains($pUrl, '/')
-                                    ? asset('storage/' . $pUrl)
-                                    : asset('storage/photos/' . $pUrl);
-                            @endphp
-                            <img src="{{ $pSrc }}" class="w-5 h-5 rounded-full object-cover"
+
+                        @if ($profileImageSrc)
+                            <img src="{{ $profileImageSrc }}" class="w-5 h-5 rounded-full object-cover"
                                 onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'">
                             <span
                                 class="hidden w-5 h-5 rounded-full bg-[#1a1a1a] items-center justify-center text-[.62rem] text-[#f5f4f1] font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
@@ -87,6 +68,7 @@
                             <span
                                 class="w-5 h-5 rounded-full bg-[#1a1a1a] inline-flex items-center justify-center text-[.62rem] text-[#f5f4f1] font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                         @endif
+
                         <span class="font-medium">{{ explode(' ', auth()->user()->name)[0] }}</span>
                         <svg class="w-2.5 h-2.5 text-[#aaa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
@@ -95,8 +77,10 @@
 
                     <div x-show="open" @click.away="open = false" x-transition x-cloak
                         class="absolute right-0 top-[calc(100%+6px)] bg-[#f5f4f1] border border-[#e0ddd8] rounded-[2px] p-1.5 min-w-[148px] z-[100] shadow-[0_8px_24px_rgba(0,0,0,.08)]">
-                        <a href="{{ route('profile') }}"
-                            class="block px-3 py-2 text-[#888] no-underline text-xs font-medium tracking-[.04em] transition-colors duration-150 hover:text-[#1a1a1a]">Perfil</a>
+                        @if (!auth()->user()->isEmployee())
+                            <a href="{{ route('profile') }}"
+                                class="block px-3 py-2 text-[#888] no-underline text-xs font-medium tracking-[.04em] transition-colors duration-150 hover:text-[#1a1a1a]">Perfil</a>
+                        @endif
                         @if (auth()->user()->isAdmin())
                             <a href="{{ route('admin.dashboard') }}"
                                 class="block px-3 py-2 text-[#888] no-underline text-xs font-medium tracking-[.04em] transition-colors duration-150 hover:text-[#1a1a1a]">Dashboard</a>

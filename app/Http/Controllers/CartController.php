@@ -25,10 +25,17 @@ class CartController extends Controller
         $validated = $request->validate([
             'color_code' => 'required|exists:colors,code',
             'size'       => 'required|in:XS,S,M,L,XL',
-            'qty'        => 'required|integer|min:1|max:99',
+            'qty'        => 'required|integer|min:0|max:99',
         ]);
 
-        app(CartService::class)->update($index, $validated['color_code'], $validated['size'], (int) $validated['qty']);
+        $qty = (int) $validated['qty'];
+        $cartService = app(CartService::class);
+
+        if ($qty === 0) {
+            $cartService->remove($index);
+        } else {
+            $cartService->update($index, $validated['color_code'], $validated['size'], $qty);
+        }
 
         return back();
     }

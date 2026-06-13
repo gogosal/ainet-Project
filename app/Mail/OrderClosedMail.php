@@ -1,26 +1,122 @@
 <?php
+
 namespace App\Mail;
+
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Collection;
 use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Intervention\Image\ImageManager;
 use Illuminate\Mail\Mailables\Attachment;
-use Illuminate\Queue\SerializesModels;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Format;
 
 class OrderClosedMail extends Mailable
 {
     use Queueable, SerializesModels;
-    public function __construct(public Order $order) {}
-    public function envelope(): Envelope { return new Envelope(subject: 'FunShirt — Encomenda #' . $this->order->id . ' enviada'); }
-    public function content(): Content { return new Content(view: 'emails.order-closed'); }
-    public function attachments(): array {
+
+    public function __construct(public Order $order)
+    {
+        $this->order->load([
+            'customer.user',
+            'items.tshirtImage',
+            'items.color',
+        ]);
+    }
+
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'FunShirt — Encomenda #' . $this->order->id . ' enviada'
+        );
+    }
+
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.order-closed',
+            with: [
+                'items' => $this->prepareItems(),
+            ],
+        );
+    }
+
+    public function attachments(): array
+    {
         if ($this->order->receipt_url) {
             $path = storage_path('app/private/' . $this->order->receipt_url);
+
             if (file_exists($path)) {
-                return [Attachment::fromPath($path)->as('recibo.pdf')->withMime('application/pdf')];
+                $fileSize = filesize($path);
+
+                \Log::info('Receipt PDF size: ' . round($fileSize / 1024 / 1024, 2) . ' MB');
+
+                if ($fileSize > 4.5 * 1024 * 1024) {
+                    \Log::warning("Order #{$this->order->id}: Recibo excede o limite do email. Será enviado sem anexo.");
+                    return [];
+                }
+
+                return [
+                    Attachment::fromPath($path)
+                        ->as('recibo.pdf')
+                        ->withMime('application/pdf'),
+                ];
             }
         }
+
         return [];
+    }
+
+    private function prepareItems(): Collection
+    {
+        ini_set('memory_limit', '512M');
+
+        return $this->order->items->map(function ($item) {
+            $imgPath = $this->resolveImagePath($item);
+            $imgSrc = null;
+
+            if ($imgPath !== null && file_exists($imgPath)) {
+                $manager = ImageManager::usingDriver(Driver::class);
+
+                $image = $manager->decode($imgPath);
+
+                $image->scale(width: 120);
+
+                $jpeg = $image->encodeUsingFormat(Format::JPEG, quality: 60);
+
+                $imgSrc = 'data:image/jpeg;base64,' . base64_encode((string) $jpeg);
+
+                unset($image);
+                unset($manager);
+            }
+
+            return [
+                'item' => $item,
+                'hasImage' => $imgSrc !== null,
+                'imgSrc' => $imgSrc,
+            ];
+        });
+    }
+
+    private function resolveImagePath($item): ?string
+    {
+        if (! $item->tshirtImage) {
+            return null;
+        }
+
+        $url = $item->tshirtImage->image_url;
+
+        if (str_starts_with($url, 'tshirt_images_private')) {
+            return storage_path('app/private/' . $url);
+        }
+
+        if (str_contains($url, '/')) {
+            return storage_path('app/public/' . $url);
+        }
+
+        return storage_path('app/public/tshirt_images/' . basename($url));
     }
 }

@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Funcionário' }} — FunShirt</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,700&display=swap"
+        rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; } [x-cloak] { display: none !important; }</style>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
+
 <body class="bg-[#f5f4f1] text-[#1a1a1a] min-h-screen" style="font-family:'Inter',system-ui,sans-serif;">
 
     <x-navbar :cartCount="0" />
@@ -32,13 +46,21 @@
         </div>
     </div>
 
-    @fluxScripts
-    @livewireScripts
+    @stack('scripts')
+
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
     <script>
-        const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        const lenis = new Lenis({
+            lerp: 0.1,
+            smoothWheel: true
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
         requestAnimationFrame(raf);
     </script>
 </body>
+
 </html>

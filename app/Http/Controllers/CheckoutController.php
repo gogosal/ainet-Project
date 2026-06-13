@@ -84,7 +84,7 @@ class CheckoutController extends Controller
         try {
             \Mail::to(auth()->user()->email)->send(new \App\Mail\OrderPendingMail($order));
         } catch (\Exception $e) {
-            \Log::error('Failed to send pending email: '.$e->getMessage());
+            \Log::error('Failed to send pending email: ' . $e->getMessage());
         }
 
         return redirect()->route('orders.show', $order->id);
